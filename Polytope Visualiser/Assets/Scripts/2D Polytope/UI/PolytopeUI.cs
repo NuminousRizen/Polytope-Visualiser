@@ -47,7 +47,8 @@ namespace _2D_Polytope.UI
                 circle.localScale = Vector3.one * theme.pointSize;
             }
 
-            LineRenderer lineRenderer = new GameObject().AddComponent<LineRenderer>();
+            LineRenderer lineRenderer = new GameObject("Lines").AddComponent<LineRenderer>();
+            lineRenderer.transform.parent = transform;
             lineRenderer.startColor = theme.lineColour;
             lineRenderer.endColor = theme.lineColour;
             lineRenderer.startWidth = theme.lineSize;
