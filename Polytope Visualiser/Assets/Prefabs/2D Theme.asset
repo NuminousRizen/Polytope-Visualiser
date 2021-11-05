@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6896f7bcc68090f49932e7ba32d5080e, type: 3}
   m_Name: 2D Theme
   m_EditorClassIdentifier: 
-  pointColour: {r: 0, g: 0, b: 0, a: 0}
-  convexHullPointColour: {r: 0, g: 0, b: 0, a: 0}
-  lineColour: {r: 0, g: 0, b: 0, a: 0}
-  pointSize: 0
-  lineSize: 0
+  pointColour: {r: 0.745283, g: 0.34100214, b: 0.34100214, a: 1}
+  convexHullPointColour: {r: 0.43182585, g: 0.7924528, b: 0.30277678, a: 1}
+  lineColour: {r: 0.3484336, g: 0.8490566, b: 0.8202639, a: 1}
+  pointSize: 0.3
+  lineSize: 0.01
