@@ -56,7 +56,7 @@ namespace _2D_Polytope.Util
 
         public static List<Vector2> GetConvexHull(List<Vector2> pointsIn)
         {
-            if (pointsIn.Count < 3) return pointsIn;
+            if (pointsIn.Count < 4) return pointsIn;
             List<Vector2> points = new List<Vector2>(pointsIn);
             Stack<Vector2> convexHullPoints = new Stack<Vector2>();
 
