@@ -29,7 +29,7 @@ namespace _2D_Polytope.UI
             
                 points = new List<Vector2>();
 
-                int numberOfPoints = Random.Range(2, 51);
+                int numberOfPoints = Random.Range(3, 51);
                 Debug.Log("Making a polytope with " + numberOfPoints + " points.");
 
                 for (int i = 0; i < numberOfPoints; i++)
@@ -83,7 +83,7 @@ namespace _2D_Polytope.UI
             polytope.AddComponent<MeshFilter>().mesh = polytopeMesh;
             MeshRenderer polytopeRenderer = polytope.AddComponent<MeshRenderer>();
             polytopeRenderer.sharedMaterial = new Material(Shader.Find("Sprites/Default"));
-            polytopeRenderer.sharedMaterial.color = Color.white;
+            polytopeRenderer.sharedMaterial.color = theme.polygonColour;
             polytope.transform.parent = transform;
         }
     }
