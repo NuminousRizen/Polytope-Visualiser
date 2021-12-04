@@ -11,5 +11,7 @@ namespace _2D_Polytope.UI
         public Color polygonColour;
         public float pointSize;
         public float lineSize;
+
+        public Transform pointPrefab;
     }
 }
