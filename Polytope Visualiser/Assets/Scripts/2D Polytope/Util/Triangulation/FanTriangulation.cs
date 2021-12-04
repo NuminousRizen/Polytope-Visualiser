@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace _2D_Polytope.Util
+namespace _2D_Polytope.Util.Triangulation
 {
     public static class FanTriangulation
     {
