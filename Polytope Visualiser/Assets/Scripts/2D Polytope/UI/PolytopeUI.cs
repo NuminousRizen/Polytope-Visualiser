@@ -2,8 +2,9 @@ using System.Collections.Generic;
 using _2D_Polytope.Util.Other;
 using _2D_Polytope.Util.Triangulation;
 using _2D_Polytope.Util.Convex_Hull;
+using UI;
 using UnityEngine;
-using Random = UnityEngine.Random;
+using UnityEngine.EventSystems;
 
 namespace _2D_Polytope.UI
 {
@@ -103,7 +104,7 @@ namespace _2D_Polytope.UI
             foreach (Vector2 point in points)
             {
                 Transform circle = Instantiate(theme.pointPrefab, point, transform.rotation);
-                circle.name = ("x: " + point.x + " ; y: " + point.y);
+                circle.name = "x: " + point.x + " ; y: " + point.y;
                 circle.parent = convexHullPoints.Contains(point)
                     ? convexHullPointsHolder
                     : otherPointsHolder;
@@ -112,6 +113,11 @@ namespace _2D_Polytope.UI
                     ? theme.convexHullPointColour
                     : theme.pointColour;
                 circle.localScale = Vector3.one * theme.pointSize;
+
+                circle.gameObject.AddComponent<BoxCollider>();
+                
+                TooltipTrigger tooltipTrigger = circle.gameObject.AddComponent<TooltipTrigger>();
+                tooltipTrigger.toShow = "x: " + point.x + " ; y: " + point.y;
             }
             
             LineRenderer lineRenderer = new GameObject("Lines").AddComponent<LineRenderer>();
