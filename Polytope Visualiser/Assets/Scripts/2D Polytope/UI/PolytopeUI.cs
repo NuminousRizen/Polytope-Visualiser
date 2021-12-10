@@ -4,7 +4,6 @@ using _2D_Polytope.Util.Triangulation;
 using _2D_Polytope.Util.Convex_Hull;
 using UI;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace _2D_Polytope.UI
 {
@@ -17,47 +16,62 @@ namespace _2D_Polytope.UI
 
         void Update()
         {
-            // This builds a random polytope (2D) from points
-            
-            // if (Input.GetKeyDown(KeyCode.Space))
-            // {
-            //     foreach (Transform child in transform) {
-            //         Destroy(child.gameObject);
-            //     }
-            //     
-            //     Camera camera = Camera.main;
-            //     float height = 2f * camera.orthographicSize;
-            //     float width = height * camera.aspect;
-            //     float buffer = height * .05f;
-            //
-            //     points = new List<Vector2>();
-            //
-            //     int numberOfPoints = Random.Range(3, 51);
-            //     Debug.Log("Making a polytope with " + numberOfPoints + " points.");
-            //
-            //     for (int i = 0; i < numberOfPoints; i++)
-            //     {
-            //         points.Add(new Vector2(Random.Range(-(width / 2) + buffer, (width / 2) - buffer), Random.Range(-(height / 2) + buffer, (height / 2) - buffer)));
-            //     }
-            //     convexHullPoints = GrahamScan.GetConvexHull(points);
-            //     BuildPolytope();
-            // }
-            
-            // This builds a (2D) polytope from inequalities
-            
+            //BuildFromPoints();
+            BuildFromInequalities();
+        }
+
+        void BuildFromPoints()
+        {
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                foreach (Transform child in transform)
+                {
+                    Destroy(child.gameObject);
+                }
+
+                Camera camera = Camera.main;
+                float height = 2f * camera.orthographicSize;
+                float width = height * camera.aspect;
+                float buffer = height * .05f;
+
+                points = new List<Vector2>();
+
+                // int numberOfPoints = Random.Range(3, 51);
+                int numberOfPoints = 3;
+                Debug.Log("Making a polytope with " + numberOfPoints + " points.");
+
+                for (int i = 0; i < numberOfPoints; i++)
+                {
+                    points.Add(new Vector2(Random.Range(-(width / 2) + buffer, (width / 2) - buffer),
+                        Random.Range(-(height / 2) + buffer, (height / 2) - buffer)));
+                }
+
+                convexHullPoints = GrahamScan.GetConvexHull(points);
+                BuildPolytope();
+            }
+        }
+
+        void BuildFromInequalities()
+        {
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 foreach (Transform child in transform) {
                     Destroy(child.gameObject);
                 }
-
+            
                 points = new List<Vector2>();
                 List<Inequality> inequalities = new List<Inequality>();
-
+            
+                // A square
                 inequalities.Add(new Inequality(0, 1, 2.5f));
                 inequalities.Add(new Inequality(1, 0,2.5f));
                 inequalities.Add(new Inequality(0, -1, 2.5f));
                 inequalities.Add(new Inequality(-1, 0, 2.5f));
+                
+                // A random inequality that generates a triangle shape
+                // inequalities.Add(new Inequality(-5f, 1, 13f));
+                // inequalities.Add(new Inequality(2f, 1, -1));
+                // inequalities.Add(new Inequality(-1f, -1, 2f));
                 
                 List<Vector2> intersectionPoints = new List<Vector2>();
                 for (int i = 0; i < inequalities.Count; i++)
@@ -69,26 +83,26 @@ namespace _2D_Polytope.UI
                         intersectionPoints.Add(currentInequality.GetIntersection(inequalities[j]));
                     }
                 }
-
+            
                 for (int i = 0; i < intersectionPoints.Count; i++)
                 {
                     Vector2 currentPoint = intersectionPoints[i];
                     bool satisfiesAll = true;
                     for (int j = 0; j < inequalities.Count; j++)
                     {
-                        if (!inequalities[j].IsWithinBounds(currentPoint.x, currentPoint.y))
+                        if (!inequalities[j].IsWithinBounds(currentPoint))
                         {
                             satisfiesAll = false;
                             break;
                         }
                     }
-
+            
                     if (satisfiesAll)
                     {
                         points.Add(currentPoint);
                     }
                 }
-
+            
                 convexHullPoints = GrahamScan.GetConvexHull(points);
                 BuildPolytope();
             }
@@ -98,8 +112,8 @@ namespace _2D_Polytope.UI
         {
             Transform convexHullPointsHolder = new GameObject("Convex Hull Points").transform;
             Transform otherPointsHolder = new GameObject("Other Points").transform;
-            convexHullPointsHolder.parent = transform;
-            otherPointsHolder.parent = transform;
+            Transform inequalitiesHolder = new GameObject("Inequalities").transform;
+            convexHullPointsHolder.parent = otherPointsHolder.parent = inequalitiesHolder.parent = transform;
 
             foreach (Vector2 point in points)
             {
@@ -119,22 +133,41 @@ namespace _2D_Polytope.UI
                 TooltipTrigger tooltipTrigger = circle.gameObject.AddComponent<TooltipTrigger>();
                 tooltipTrigger.toShow = "x: " + point.x + " ; y: " + point.y;
             }
+
+            for (int i = 0; i < convexHullPoints.Count; i++)
+            {
+                Vector2 pointA = convexHullPoints[i];
+                Vector2 pointB = convexHullPoints[(i + 1) % convexHullPoints.Count];
+                Vector2 referencePoint = convexHullPoints[(i + 2) % convexHullPoints.Count];
+
+                Inequality inequality = Inequality.GetInequalityFromPoints(pointA, pointB, referencePoint);
+                LineRenderer lineRenderer =
+                    new GameObject(inequality.GetPrettyInequality()).AddComponent<LineRenderer>();
+                lineRenderer.transform.parent = inequalitiesHolder;
+                lineRenderer.startColor = theme.lineColour;
+                lineRenderer.endColor = theme.lineColour;
+                lineRenderer.startWidth = theme.lineSize;
+                lineRenderer.endWidth = theme.lineSize;
+                lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+                lineRenderer.positionCount = 2;
+                lineRenderer.SetPositions(new Vector3[] { pointA, pointB });
+
+                MeshCollider meshCollider = lineRenderer.gameObject.AddComponent<MeshCollider>();
+
+                Mesh mesh = new Mesh();
+                lineRenderer.BakeMesh(mesh, true);
+                meshCollider.sharedMesh = mesh;
+
+                TooltipTrigger tooltipTrigger = lineRenderer.gameObject.AddComponent<TooltipTrigger>();
+                tooltipTrigger.toShow = inequality.GetPrettyInequality();
+            }
             
-            LineRenderer lineRenderer = new GameObject("Lines").AddComponent<LineRenderer>();
-            lineRenderer.transform.parent = transform;
-            lineRenderer.startColor = theme.lineColour;
-            lineRenderer.endColor = theme.lineColour;
-            lineRenderer.startWidth = theme.lineSize;
-            lineRenderer.endWidth = theme.lineSize;
-            lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
             List<Vector3> toDisplay = new List<Vector3>();
             foreach (Vector2 point in convexHullPoints)
             {
                 toDisplay.Add(new Vector3(point.x, point.y));
             }
             toDisplay.Add(new Vector3(convexHullPoints[0].x, convexHullPoints[0].y));
-            lineRenderer.positionCount = toDisplay.Count;
-            lineRenderer.SetPositions(toDisplay.ToArray());
 
             toDisplay.RemoveAt(toDisplay.Count - 1);
             Mesh polytopeMesh = new Mesh();
