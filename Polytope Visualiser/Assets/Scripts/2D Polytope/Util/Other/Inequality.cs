@@ -35,6 +35,11 @@ namespace _2D_Polytope.Util.Other
         {
             return _a * x + _b * y + _c >= 0;
         }
+        
+        public bool IsWithinBounds(Vector2 point)
+        {
+            return _a * point.x + _b * point.y + _c >= 0;
+        }
     
         public Vector2 GetIntersection(Inequality other)
         {
@@ -42,6 +47,41 @@ namespace _2D_Polytope.Util.Other
             float y = (other.GetC() * _a - _c * other.GetA()) / (_b * other.GetA() - other.GetB() * _a);
 
             return new Vector2(x, y);
+        }
+
+        public string GetPrettyInequality()
+        {
+            return "(" + _a + ")x + (" + _b + ")y + (" + _c + ") >= 0";
+        }
+
+        public static Inequality GetInequalityFromPoints(Vector2 pointA, Vector2 pointB, Vector2 referencePoint)
+        {
+            Inequality inequalityA;
+            Inequality inequalityB;
+            
+            if (pointA.y == pointB.y)
+            {
+                inequalityA = new Inequality(0, 1, -pointA.y);
+                inequalityB = new Inequality(0, -1, pointA.y);
+            }
+
+            else if (pointA.x == pointB.x)
+            {
+                inequalityA = new Inequality(1, 0, -pointA.x);
+                inequalityB = new Inequality(-1, 0, pointA.x);
+            }
+
+            else
+            {
+                float slope = (pointB.y - pointA.y) / (pointB.x - pointA.x);
+                float yIntercept = pointA.y - slope * pointA.x;
+
+                inequalityA = new Inequality(-slope, 1, -yIntercept);
+                inequalityB = new Inequality(slope, -1, yIntercept);
+            }
+
+            if (inequalityA.IsWithinBounds(referencePoint)) return inequalityA;
+            return inequalityB;
         }
     }
 }
