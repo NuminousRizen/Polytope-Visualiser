@@ -1,53 +1,67 @@
 using System.Collections.Generic;
-using _2D_Polytope.Util.Other;
-using _2D_Polytope.Util.Triangulation;
-using _2D_Polytope.Util.Convex_Hull;
-using UI;
+using Polytope2D.Util.Other;
+using Polytope2D.Util.Triangulation;
+using Polytope2D.Util.Convex_Hull;
+using UI.Tooltip;
 using UnityEngine;
 
-namespace _2D_Polytope.UI
+namespace Polytope2D.UI
 {
     public class PolytopeUI : MonoBehaviour
     {
         public Theme2D theme;
         
         public List<Vector2> points;
-        private List<Vector2> convexHullPoints;
 
-        void Update()
+        private Transform _convexHullPointsHolder;
+        private Transform _otherPointsHolder;
+        private Transform _linesHolder;
+
+        private static List<Vector2> GenerateRandomPoints()
+        {
+            Camera camera = Camera.main;
+            float height = 2f * camera.orthographicSize;
+            float width = height * camera.aspect;
+            float buffer = height * .05f;
+
+            List<Vector2> generatedPoints = new List<Vector2>();
+            
+            int numberOfPoints = Random.Range(3, 51);
+            Debug.Log("Generated " + numberOfPoints + " points.");
+
+            for (int i = 0; i < numberOfPoints; i++)
+            {
+                generatedPoints.Add(new Vector2(Random.Range(-(width / 2) + buffer, (width / 2) - buffer),
+                    Random.Range(-(height / 2) + buffer, (height / 2) - buffer)));
+            }
+
+            return generatedPoints;
+        }
+
+        private void Update()
         {
             //BuildFromPoints();
             BuildFromInequalities();
+        }
+
+        private void Clear()
+        {
+            foreach (Transform child in transform) {
+                Destroy(child.gameObject);
+            }
+            
+            _convexHullPointsHolder = new GameObject("Convex Hull Points").transform;
+            _otherPointsHolder = new GameObject("Other Points").transform;
+            _linesHolder = new GameObject("Inequalities").transform;
+            _convexHullPointsHolder.parent = _otherPointsHolder.parent = _linesHolder.parent = transform;
         }
 
         void BuildFromPoints()
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                foreach (Transform child in transform)
-                {
-                    Destroy(child.gameObject);
-                }
-
-                Camera camera = Camera.main;
-                float height = 2f * camera.orthographicSize;
-                float width = height * camera.aspect;
-                float buffer = height * .05f;
-
-                points = new List<Vector2>();
-
-                // int numberOfPoints = Random.Range(3, 51);
-                int numberOfPoints = 3;
-                Debug.Log("Making a polytope with " + numberOfPoints + " points.");
-
-                for (int i = 0; i < numberOfPoints; i++)
-                {
-                    points.Add(new Vector2(Random.Range(-(width / 2) + buffer, (width / 2) - buffer),
-                        Random.Range(-(height / 2) + buffer, (height / 2) - buffer)));
-                }
-
-                convexHullPoints = GrahamScan.GetConvexHull(points);
-                BuildPolytope();
+                points = GenerateRandomPoints();
+                BuildPolytope(GrahamScan.GetConvexHull(points));
             }
         }
 
@@ -55,10 +69,6 @@ namespace _2D_Polytope.UI
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                foreach (Transform child in transform) {
-                    Destroy(child.gameObject);
-                }
-            
                 points = new List<Vector2>();
                 List<Inequality> inequalities = new List<Inequality>();
             
@@ -102,38 +112,46 @@ namespace _2D_Polytope.UI
                         points.Add(currentPoint);
                     }
                 }
-            
-                convexHullPoints = GrahamScan.GetConvexHull(points);
-                BuildPolytope();
+                BuildPolytope(GrahamScan.GetConvexHull(points));
             }
         }
 
-        void BuildPolytope()
+        private void BuildPolytope(List<Vector2> convexHullPoints)
         {
-            Transform convexHullPointsHolder = new GameObject("Convex Hull Points").transform;
-            Transform otherPointsHolder = new GameObject("Other Points").transform;
-            Transform inequalitiesHolder = new GameObject("Inequalities").transform;
-            convexHullPointsHolder.parent = otherPointsHolder.parent = inequalitiesHolder.parent = transform;
+            Clear();
+            BuildPoints(convexHullPoints);
+            BuildLines(convexHullPoints);
+            BuildPolytopeMesh(convexHullPoints);
+        }
 
+        private void BuildPoints(List<Vector2> convexHullPoints)
+        {
             foreach (Vector2 point in points)
             {
-                Transform circle = Instantiate(theme.pointPrefab, point, transform.rotation);
-                circle.name = "x: " + point.x + " ; y: " + point.y;
-                circle.parent = convexHullPoints.Contains(point)
-                    ? convexHullPointsHolder
-                    : otherPointsHolder;
+                Transform pointObject = Instantiate(theme.pointPrefab, point, transform.rotation);
+                pointObject.name = "x: " + point.x + " ; y: " + point.y;
+
+                bool isConvexHullPoint = convexHullPoints.Contains(point);
                 
-                circle.GetComponent<SpriteRenderer>().color = convexHullPoints.Contains(point)
+                pointObject.parent = isConvexHullPoint
+                    ? _convexHullPointsHolder
+                    : _otherPointsHolder;
+                
+                pointObject.GetComponent<SpriteRenderer>().color = isConvexHullPoint
                     ? theme.convexHullPointColour
                     : theme.pointColour;
-                circle.localScale = Vector3.one * theme.pointSize;
-
-                circle.gameObject.AddComponent<BoxCollider>();
                 
-                TooltipTrigger tooltipTrigger = circle.gameObject.AddComponent<TooltipTrigger>();
+                pointObject.localScale = Vector3.one * theme.pointSize;
+
+                pointObject.gameObject.AddComponent<BoxCollider>();
+                
+                TooltipTrigger tooltipTrigger = pointObject.gameObject.AddComponent<TooltipTrigger>();
                 tooltipTrigger.toShow = "x: " + point.x + " ; y: " + point.y;
             }
+        }
 
+        private void BuildLines(List<Vector2> convexHullPoints)
+        {
             for (int i = 0; i < convexHullPoints.Count; i++)
             {
                 Vector2 pointA = convexHullPoints[i];
@@ -143,7 +161,7 @@ namespace _2D_Polytope.UI
                 Inequality inequality = Inequality.GetInequalityFromPoints(pointA, pointB, referencePoint);
                 LineRenderer lineRenderer =
                     new GameObject(inequality.GetPrettyInequality()).AddComponent<LineRenderer>();
-                lineRenderer.transform.parent = inequalitiesHolder;
+                lineRenderer.transform.parent = _linesHolder;
                 lineRenderer.startColor = theme.lineColour;
                 lineRenderer.endColor = theme.lineColour;
                 lineRenderer.startWidth = theme.lineSize;
@@ -161,15 +179,15 @@ namespace _2D_Polytope.UI
                 TooltipTrigger tooltipTrigger = lineRenderer.gameObject.AddComponent<TooltipTrigger>();
                 tooltipTrigger.toShow = inequality.GetPrettyInequality();
             }
-            
+        }
+
+        private void BuildPolytopeMesh(List<Vector2> convexHullPoints)
+        {
             List<Vector3> toDisplay = new List<Vector3>();
             foreach (Vector2 point in convexHullPoints)
             {
                 toDisplay.Add(new Vector3(point.x, point.y));
             }
-            toDisplay.Add(new Vector3(convexHullPoints[0].x, convexHullPoints[0].y));
-
-            toDisplay.RemoveAt(toDisplay.Count - 1);
             Mesh polytopeMesh = new Mesh();
             polytopeMesh.vertices = toDisplay.ToArray();
             polytopeMesh.triangles = FanTriangulation.Triangulate(convexHullPoints);

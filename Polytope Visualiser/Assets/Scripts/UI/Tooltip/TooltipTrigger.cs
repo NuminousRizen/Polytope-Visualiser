@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace UI
+namespace UI.Tooltip
 {
     public class TooltipTrigger : MonoBehaviour
     {

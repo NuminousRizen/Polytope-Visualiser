@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace _2D_Polytope.Util.Other
+namespace Polytope2D.Util.Other
 {
     // Holds an inequality in the form ax + by + c >= 0
     public struct Inequality
