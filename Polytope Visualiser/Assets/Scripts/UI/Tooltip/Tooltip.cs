@@ -21,6 +21,7 @@ namespace UI.Tooltip
 
         private void Update()
         {
+            if (!enabled) return;
             Vector2 mousePosition = Input.mousePosition;
             float pivotX = mousePosition.x / Screen.width;
             _rectTransform.pivot = new Vector2(pivotX, 0);
