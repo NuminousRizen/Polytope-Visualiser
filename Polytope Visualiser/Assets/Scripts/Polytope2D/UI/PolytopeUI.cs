@@ -4,6 +4,7 @@ using Polytope2D.Util.Triangulation;
 using Polytope2D.Util.Convex_Hull;
 using UI.Tooltip;
 using UnityEngine;
+using Util;
 
 namespace Polytope2D.UI
 {
@@ -11,27 +12,27 @@ namespace Polytope2D.UI
     {
         public Theme2D theme;
         
-        public List<Vector2> points;
+        public List<VectorD2D> points;
 
         private Transform _convexHullPointsHolder;
         private Transform _otherPointsHolder;
         private Transform _linesHolder;
 
-        private static List<Vector2> GenerateRandomPoints()
+        private static List<VectorD2D> GenerateRandomPoints()
         {
             Camera camera = Camera.main;
             float height = 2f * camera.orthographicSize;
             float width = height * camera.aspect;
             float buffer = height * .05f;
 
-            List<Vector2> generatedPoints = new List<Vector2>();
+            List<VectorD2D> generatedPoints = new List<VectorD2D>();
             
             int numberOfPoints = Random.Range(3, 51);
             Debug.Log("Generated " + numberOfPoints + " points.");
 
             for (int i = 0; i < numberOfPoints; i++)
             {
-                generatedPoints.Add(new Vector2(Random.Range(-(width / 2) + buffer, (width / 2) - buffer),
+                generatedPoints.Add(new VectorD2D(Random.Range(-(width / 2) + buffer, (width / 2) - buffer),
                     Random.Range(-(height / 2) + buffer, (height / 2) - buffer)));
             }
 
@@ -69,21 +70,20 @@ namespace Polytope2D.UI
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                points = new List<Vector2>();
+                points = new List<VectorD2D>();
                 List<Inequality> inequalities = new List<Inequality>();
             
                 // A square
-                inequalities.Add(new Inequality(0, 1, 2.5f));
-                inequalities.Add(new Inequality(1, 0,2.5f));
-                inequalities.Add(new Inequality(0, -1, 2.5f));
-                inequalities.Add(new Inequality(-1, 0, 2.5f));
+                // inequalities.Add(new Inequality(0, 1, 2.5f));
+                // inequalities.Add(new Inequality(1, 0,2.5f));
+                // inequalities.Add(new Inequality(0, -1, 2.5f));
+                // inequalities.Add(new Inequality(-1, 0, 2.5f));
                 
-                // A random inequality that generates a triangle shape
-                // inequalities.Add(new Inequality(-5f, 1, 13f));
-                // inequalities.Add(new Inequality(2f, 1, -1));
-                // inequalities.Add(new Inequality(-1f, -1, 2f));
-                
-                List<Vector2> intersectionPoints = new List<Vector2>();
+                inequalities.Add(new Inequality(-0.3960672, -1, 2.081373));
+                inequalities.Add(new Inequality(-0.07919004, -1,1.726297));
+                inequalities.Add(new Inequality(0.2678808, 1, -1.393981));
+
+                List<VectorD2D> intersectionPoints = new List<VectorD2D>();
                 for (int i = 0; i < inequalities.Count; i++)
                 {
                     Inequality currentInequality = inequalities[i];
@@ -96,7 +96,7 @@ namespace Polytope2D.UI
             
                 for (int i = 0; i < intersectionPoints.Count; i++)
                 {
-                    Vector2 currentPoint = intersectionPoints[i];
+                    VectorD2D currentPoint = intersectionPoints[i];
                     bool satisfiesAll = true;
                     for (int j = 0; j < inequalities.Count; j++)
                     {
@@ -116,7 +116,7 @@ namespace Polytope2D.UI
             }
         }
 
-        private void BuildPolytope(List<Vector2> convexHullPoints)
+        private void BuildPolytope(List<VectorD2D> convexHullPoints)
         {
             Clear();
             BuildPoints(convexHullPoints);
@@ -124,11 +124,11 @@ namespace Polytope2D.UI
             BuildPolytopeMesh(convexHullPoints);
         }
 
-        private void BuildPoints(List<Vector2> convexHullPoints)
+        private void BuildPoints(List<VectorD2D> convexHullPoints)
         {
-            foreach (Vector2 point in points)
+            foreach (VectorD2D point in points)
             {
-                Transform pointObject = Instantiate(theme.pointPrefab, point, transform.rotation);
+                Transform pointObject = Instantiate(theme.pointPrefab, point.ToVector2(), transform.rotation);
                 pointObject.name = "x: " + point.x + " ; y: " + point.y;
 
                 bool isConvexHullPoint = convexHullPoints.Contains(point);
@@ -150,13 +150,13 @@ namespace Polytope2D.UI
             }
         }
 
-        private void BuildLines(List<Vector2> convexHullPoints)
+        private void BuildLines(List<VectorD2D> convexHullPoints)
         {
             for (int i = 0; i < convexHullPoints.Count; i++)
             {
-                Vector2 pointA = convexHullPoints[i];
-                Vector2 pointB = convexHullPoints[(i + 1) % convexHullPoints.Count];
-                Vector2 referencePoint = convexHullPoints[(i + 2) % convexHullPoints.Count];
+                VectorD2D pointA = convexHullPoints[i];
+                VectorD2D pointB = convexHullPoints[(i + 1) % convexHullPoints.Count];
+                VectorD2D referencePoint = convexHullPoints[(i + 2) % convexHullPoints.Count];
 
                 Inequality inequality = Inequality.GetInequalityFromPoints(pointA, pointB, referencePoint);
                 LineRenderer lineRenderer =
@@ -168,7 +168,7 @@ namespace Polytope2D.UI
                 lineRenderer.endWidth = theme.lineSize;
                 lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
                 lineRenderer.positionCount = 2;
-                lineRenderer.SetPositions(new Vector3[] { pointA, pointB });
+                lineRenderer.SetPositions(new Vector3[] { pointA.ToVector2(), pointB.ToVector2() });
 
                 MeshCollider meshCollider = lineRenderer.gameObject.AddComponent<MeshCollider>();
 
@@ -181,12 +181,12 @@ namespace Polytope2D.UI
             }
         }
 
-        private void BuildPolytopeMesh(List<Vector2> convexHullPoints)
+        private void BuildPolytopeMesh(List<VectorD2D> convexHullPoints)
         {
             List<Vector3> toDisplay = new List<Vector3>();
-            foreach (Vector2 point in convexHullPoints)
+            foreach (VectorD2D point in convexHullPoints)
             {
-                toDisplay.Add(new Vector3(point.x, point.y));
+                toDisplay.Add(new Vector3((float) point.x, (float) point.y));
             }
             Mesh polytopeMesh = new Mesh();
             polytopeMesh.vertices = toDisplay.ToArray();
