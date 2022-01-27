@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using UnityEngine;
 using Util;
 
 namespace Polytope2D.Util.Convex_Hull
