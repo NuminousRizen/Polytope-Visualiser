@@ -249,7 +249,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   theme: {fileID: 11400000, guid: 858bdc76d9b94854896b922f08806227, type: 2}
-  points: []
 --- !u!4 &622774235
 Transform:
   m_ObjectHideFlags: 0

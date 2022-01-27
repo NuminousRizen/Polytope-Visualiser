@@ -18,4 +18,4 @@ MonoBehaviour:
   polygonColour: {r: 0.68735015, g: 0.38501248, b: 0.7924528, a: 0.69411767}
   pointSize: 0.3
   lineSize: 0.1
-  pointPrefab: {fileID: 5295423626232801765, guid: 6b55008b7f3346745b62b78ceb2f938d, type: 3}
+  pointPrefab: {fileID: 9082198541285984242, guid: 51c2aa01ae75c1142a835cab22122289, type: 3}

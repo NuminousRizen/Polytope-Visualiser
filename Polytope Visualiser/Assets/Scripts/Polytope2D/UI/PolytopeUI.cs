@@ -137,7 +137,7 @@ namespace Polytope2D.UI
                     ? _convexHullPointsHolder
                     : _otherPointsHolder;
                 
-                pointObject.GetComponent<SpriteRenderer>().color = isConvexHullPoint
+                pointObject.GetComponent<Renderer>().sharedMaterial.color = isConvexHullPoint
                     ? theme.convexHullPointColour
                     : theme.pointColour;
                 
