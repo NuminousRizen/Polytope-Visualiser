@@ -20,7 +20,7 @@ namespace Polytope2D.Util.Convex_Hull
             return crossProduct.z < 0;
         }
         
-        public static List<VectorD2D> FindConvexHull(List<VectorD2D> points)
+        public static List<VectorD2D> GetConvexHull(List<VectorD2D> points)
         {
             if (points.Count <= 3) return points;
             
