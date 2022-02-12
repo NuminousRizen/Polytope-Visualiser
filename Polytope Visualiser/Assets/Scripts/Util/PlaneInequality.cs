@@ -1,7 +1,8 @@
-﻿using System;
-
-namespace Util
+﻿namespace Util
 {
+    /// <summary>
+    /// A plane inequality (i.e. a 3D inequality) is described as an inequality in the form ax + by + cz + d >= 0.
+    /// </summary>
     public struct PlaneInequality
     {
         public double a, b, c, d;
@@ -19,16 +20,34 @@ namespace Util
             return "(" + a + ")x + (" + b + ")y + (" + c + ")z + " + d + " >= 0";
         }
 
+        /// <summary>
+        /// Get the distance between the given point and this plane.
+        /// </summary>
+        /// <param name="p">The point from which to find the distance from.</param>
+        /// <returns>The distance from the point to this plane.</returns>
         public double GetDistance(VectorD3D p)
         {
             return a * p.x + b * p.y + c * p.z + d;
         }
 
+        /// <summary>
+        /// Check whether the given point satisfies this inequality.
+        /// </summary>
+        /// <param name="point">The point that needs to be checked.</param>
+        /// <returns>Whether the given point satisfies this inequality.</returns>
         public bool IsWithinBounds(VectorD3D point)
         {
             return a * point.x + b * point.y + c * point.z + d >= -VectorD2D.GetEpsilon();
         }
 
+        /// <summary>
+        /// Build a plane inequality from the given points an a reference point.
+        /// </summary>
+        /// <param name="p1">The first point.</param>
+        /// <param name="p2">The second point.</param>
+        /// <param name="p3">The third point.</param>
+        /// <param name="referencePoint">A reference point that is known to satisfy the inequality.</param>
+        /// <returns>The plane inequality.</returns>
         public static PlaneInequality GetPlaneInequalityFromPoints(VectorD3D p1, VectorD3D p2, VectorD3D p3,
             VectorD3D referencePoint)
         {
@@ -48,6 +67,13 @@ namespace Util
             return inequality;
         }
 
+        /// <summary>
+        /// Calculate the z value of the intersection point between the three planes.
+        /// </summary>
+        /// <param name="p1">The first inequality.</param>
+        /// <param name="p2">The second inequality.</param>
+        /// <param name="p3">The third inequality.</param>
+        /// <returns>The z value of the intersection point, null if no value could be found (i.e. planes do not intersect at a point).</returns>
         private static double? GetZ(PlaneInequality p1, PlaneInequality p2, PlaneInequality p3)
         {
             try
@@ -69,12 +95,19 @@ namespace Util
 
                 return top / bot;
             }
-            catch (Exception e)
+            catch
             {
                 return null;
             }
         }
 
+        /// <summary>
+        /// Calculate the y value of the intersection point between three planes.
+        /// </summary>
+        /// <param name="z">The z value of the intersection point.</param>
+        /// <param name="p1">The first inequality.</param>
+        /// <param name="p2">The second inequality.</param>
+        /// <returns>The y value of the intersection point, null if no value could be found (i.e. planes do not intersect at a point).</returns>
         private static double? GetY(double z, PlaneInequality p1, PlaneInequality p2)
         {
             try
@@ -86,12 +119,19 @@ namespace Util
 
                 return y;
             }
-            catch (Exception e)
+            catch
             {
                 return null;
             }
         }
 
+        /// <summary>
+        /// Calculate the x value of the intersection point between three planes.
+        /// </summary>
+        /// <param name="z">The z value of the intersection point.</param>
+        /// <param name="y">The y value of the intersection point.</param>
+        /// <param name="p1">The first inequality</param>
+        /// <returns>The x value of the intersection point, null if no value could be found (i.e. planes do not intersect at a point).</returns>
         private static double? GetX(double z, double y, PlaneInequality p1)
         {
             try
@@ -101,12 +141,19 @@ namespace Util
                     p1.a
                 );
             }
-            catch (Exception e)
+            catch
             {
                 return null;
             }
         }
 
+        /// <summary>
+        /// Get the intersection point between three planes.
+        /// </summary>
+        /// <param name="p1">The first plane.</param>
+        /// <param name="p2">The second plane.</param>
+        /// <param name="p3">The third plane.</param>
+        /// <returns>The intersection point, null if no point could be found (i.e. planes do not intersect at a point).</returns>
         public static VectorD3D? GetIntersection(PlaneInequality p1, PlaneInequality p2, PlaneInequality p3)
         {
             double? z = GetZ(p1, p2, p3);
