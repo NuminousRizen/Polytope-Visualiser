@@ -43,23 +43,21 @@ namespace Util
     
     public struct Face
     {
-        private VectorD3D _p1, _p2, _p3;
-        private Edge _edge1, _edge2, _edge3;
-        private VectorD3D _normal;
+        private VectorD3D p1, p2, p3;
+        private Edge edge1, edge2, edge3;
+        private PlaneInequality faceInequality;
 
         public Face(VectorD3D p1, VectorD3D p2, VectorD3D p3)
         {
-            _p1 = p1;
-            _p2 = p2;
-            _p3 = p3;
+            this.p1 = p1;
+            this.p2 = p2;
+            this.p3 = p3;
 
-            _edge1 = new Edge(p1, p2);
-            _edge2 = new Edge(p2, p3);
-            _edge3 = new Edge(p1, p3);
+            edge1 = new Edge(p1, p2);
+            edge2 = new Edge(p2, p3);
+            edge3 = new Edge(p1, p3);
 
-            VectorD3D a = p1 - p2;
-            VectorD3D b = p2 - p3;
-            _normal = VectorD3D.Cross(a, b);
+            faceInequality = PlaneInequality.GetPlaneInequalityFromPoints(p1, p2, p3, p1);
         }
 
         public static bool operator ==(Face f1, Face f2)
@@ -104,31 +102,30 @@ namespace Util
 
         public override int GetHashCode()
         {
-            return (_p1 + _p2 + _p3).GetHashCode();
+            return (p1 + p2 + p3).GetHashCode();
         }
 
         public override string ToString()
         {
-            return "Point1: " + _p1 + "\nPoint2" + _p2 + "\nPoint3" + _p3;
+            return "Point1: " + p1 + "\nPoint2" + p2 + "\nPoint3" + p3;
         }
 
         public double GetDistanceFromFacePlane(VectorD3D point)
         {
-            return VectorD3D.Dot(_normal, point - _p1);
+            return faceInequality.GetDistance(point);
         }
 
         public void CorrectNormal(List<VectorD3D> internalPoints)
         {
             foreach (VectorD3D point in internalPoints)
             {
-                double distance = GetDistanceFromFacePlane(point);
+                double distance = faceInequality.GetDistance(point);
                 if (distance > VectorD3D.GetEpsilon())
                 {
-                    _normal = new VectorD3D(
-                        -1 *_normal.x,
-                        -1 *_normal.y,
-                        -1 *_normal.z
-                    );
+                    faceInequality.a = -faceInequality.a;
+                    faceInequality.b = -faceInequality.b;
+                    faceInequality.c = -faceInequality.c;
+                    faceInequality.d = -faceInequality.d;
 
                     return;
                 }
@@ -137,17 +134,22 @@ namespace Util
 
         public bool IsVisible(VectorD3D eyePoint)
         {
-            return GetDistanceFromFacePlane(eyePoint) > VectorD3D.GetEpsilon();
+            return faceInequality.GetDistance(eyePoint) > VectorD3D.GetEpsilon();
+        }
+
+        public string GetInequality()
+        {
+            return faceInequality.ToString();
         }
 
         public (Edge, Edge, Edge) GetEdges()
         {
-            return (_edge1, _edge2, _edge3);
+            return (edge1, edge2, edge3);
         }
 
         public (VectorD3D, VectorD3D, VectorD3D) GetPoints()
         {
-            return (_p1, _p2, _p3);
+            return (p1, p2, p3);
         }
     }
 }

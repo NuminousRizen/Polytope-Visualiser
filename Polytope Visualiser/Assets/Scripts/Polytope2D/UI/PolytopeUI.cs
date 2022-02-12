@@ -66,8 +66,8 @@ namespace Polytope2D.UI
         private void Update()
         {
             HandleInput();
-            BuildFromPoints();
-            //BuildFromInequalities();
+            //BuildFromPoints();
+            BuildFromInequalities();
         }
 
         private void HandleInput()
@@ -76,7 +76,11 @@ namespace Polytope2D.UI
             if (mouseScroll.y != 0)
             {
                 float change = mouseScroll.y * .1f;
-                transform.localScale += new Vector3(change, change, change);
+                Vector3 temp = transform.localScale + new Vector3(change, change, change);
+                if (temp != Vector3.zero)
+                {
+                    transform.localScale = temp;
+                }
             }
             
             if (Input.GetMouseButton(0))
@@ -86,7 +90,7 @@ namespace Polytope2D.UI
             }
             else if (Input.GetMouseButton(1))
             {
-                _mousePos += new Vector2(-Input.GetAxis("Mouse X"),-Input.GetAxis("Mouse Y")) * 1.5f;
+                _mousePos += new Vector2(Input.GetAxis("Mouse X"),-Input.GetAxis("Mouse Y")) * 2f;
                 transform.rotation = Quaternion.Euler(_mousePos.y, _mousePos.x, 0);
             }
 
@@ -158,49 +162,107 @@ namespace Polytope2D.UI
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                points = new List<VectorD2D>();
-                List<Inequality> inequalities = new List<Inequality>();
-            
-                // A square
-                // inequalities.Add(new Inequality(0, 1, 2.5f));
-                // inequalities.Add(new Inequality(1, 0,2.5f));
-                // inequalities.Add(new Inequality(0, -1, 2.5f));
-                // inequalities.Add(new Inequality(-1, 0, 2.5f));
+                // points = new List<VectorD2D>();
+                // List<Inequality> inequalities = new List<Inequality>();
+                //
+                // // A square
+                // // inequalities.Add(new Inequality(0, 1, 2.5f));
+                // // inequalities.Add(new Inequality(1, 0,2.5f));
+                // // inequalities.Add(new Inequality(0, -1, 2.5f));
+                // // inequalities.Add(new Inequality(-1, 0, 2.5f));
+                //
+                // inequalities.Add(new Inequality(-0.3960672, -1, 2.081373));
+                // inequalities.Add(new Inequality(-0.07919004, -1,1.726297));
+                // inequalities.Add(new Inequality(0.2678808, 1, -1.393981));
+                //
+                // List<VectorD2D> intersectionPoints = new List<VectorD2D>();
+                // for (int i = 0; i < inequalities.Count; i++)
+                // {
+                //     Inequality currentInequality = inequalities[i];
+                //     
+                //     for (int j = i + 1; j < inequalities.Count; j++)
+                //     {
+                //         intersectionPoints.Add(currentInequality.GetIntersection(inequalities[j]));
+                //     }
+                // }
+                //
+                // for (int i = 0; i < intersectionPoints.Count; i++)
+                // {
+                //     VectorD2D currentPoint = intersectionPoints[i];
+                //     bool satisfiesAll = true;
+                //     for (int j = 0; j < inequalities.Count; j++)
+                //     {
+                //         if (!inequalities[j].IsWithinBounds(currentPoint))
+                //         {
+                //             satisfiesAll = false;
+                //             break;
+                //         }
+                //     }
+                //
+                //     if (satisfiesAll)
+                //     {
+                //         points.Add(currentPoint);
+                //     }
+                // }
+                // BuildPolytope(GrahamScan.GetConvexHull(points));
                 
-                inequalities.Add(new Inequality(-0.3960672, -1, 2.081373));
-                inequalities.Add(new Inequality(-0.07919004, -1,1.726297));
-                inequalities.Add(new Inequality(0.2678808, 1, -1.393981));
-
-                List<VectorD2D> intersectionPoints = new List<VectorD2D>();
-                for (int i = 0; i < inequalities.Count; i++)
+                // ------------- Testing 3D ------------- //
+                List<PlaneInequality> planes = new List<PlaneInequality>
                 {
-                    Inequality currentInequality = inequalities[i];
-                    
-                    for (int j = i + 1; j < inequalities.Count; j++)
+                    new PlaneInequality(0,0,-1,5),
+                    new PlaneInequality(0,-1,0,5),
+                    new PlaneInequality(-1,0,0,5),
+
+                    new PlaneInequality(1,0,0,0),
+                    new PlaneInequality(0,0,1,0),
+                    new PlaneInequality(0,1,0,0)
+                };
+
+                HashSet<VectorD3D> intersectionPoints = new HashSet<VectorD3D>();
+
+                for (int i = 0; i < planes.Count; i++)
+                {
+                    for (int j = 0; j < planes.Count; j++)
                     {
-                        intersectionPoints.Add(currentInequality.GetIntersection(inequalities[j]));
+                        if (i != j)
+                        {
+                            for (int k = 0; k < planes.Count; k++)
+                            {
+                                if (k != i && k != j)
+                                {
+                                    VectorD3D? intersectionPoint = PlaneInequality.GetIntersection(
+                                        planes[i],
+                                        planes[j],
+                                        planes[k]
+                                    );
+                                    if (intersectionPoint != null)
+                                    {
+                                        intersectionPoints.Add(intersectionPoint.Value);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
-            
-                for (int i = 0; i < intersectionPoints.Count; i++)
+
+                List<VectorD3D> points3D = new List<VectorD3D>();
+                foreach (VectorD3D point in intersectionPoints)
                 {
-                    VectorD2D currentPoint = intersectionPoints[i];
-                    bool satisfiesAll = true;
-                    for (int j = 0; j < inequalities.Count; j++)
+                    bool isValid = true;
+                    foreach (PlaneInequality plane in planes)
                     {
-                        if (!inequalities[j].IsWithinBounds(currentPoint))
+                        if (!plane.IsWithinBounds(point))
                         {
-                            satisfiesAll = false;
+                            isValid = false;
                             break;
                         }
                     }
-            
-                    if (satisfiesAll)
-                    {
-                        points.Add(currentPoint);
-                    }
+                    
+                    if (isValid) points3D.Add(point);
                 }
-                BuildPolytope(GrahamScan.GetConvexHull(points));
+                HashSet<Face> faces = Incremental3D.GetConvexHull(points3D);
+                BuildPolytope3D(faces, points3D);
+                // ------------------------------------- //
             }
         }
 
@@ -256,12 +318,18 @@ namespace Polytope2D.UI
                 polytopeMesh.triangles = new int[]{0,1,2};
                 polytopeMesh.RecalculateNormals();
             
-                GameObject polytope = new GameObject("Polytope");
-                polytope.AddComponent<MeshFilter>().mesh = polytopeMesh;
-                MeshRenderer polytopeRenderer = polytope.AddComponent<MeshRenderer>();
+                GameObject polytopeFace = new GameObject(face.GetInequality());
+                polytopeFace.AddComponent<MeshFilter>().mesh = polytopeMesh;
+                MeshRenderer polytopeRenderer = polytopeFace.AddComponent<MeshRenderer>();
                 polytopeRenderer.sharedMaterial = new Material(Shader.Find("Sprites/Default"));
                 polytopeRenderer.sharedMaterial.color = theme.polygonColour;
-                polytope.transform.parent = transform;
+                polytopeFace.transform.parent = transform;
+                
+                MeshCollider meshCollider = polytopeFace.gameObject.AddComponent<MeshCollider>();
+                meshCollider.sharedMesh = polytopeMesh;
+
+                TooltipTrigger tooltipTrigger = polytopeFace.gameObject.AddComponent<TooltipTrigger>();
+                tooltipTrigger.toShow = face.GetInequality();
             }
         }
 

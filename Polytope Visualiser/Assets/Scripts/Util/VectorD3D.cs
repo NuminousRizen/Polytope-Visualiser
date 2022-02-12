@@ -84,7 +84,17 @@ namespace Util
                 a.x * b.y - a.y * b.x
                 );
         }
-        
+
+        public static VectorD3D Normalise(VectorD3D a)
+        {
+            double magnitude = a.Magnitude();
+            a.x = a.x / magnitude;
+            a.y = a.y / magnitude;
+            a.z = a.z / magnitude;
+
+            return a;
+        }
+
         public static VectorD3D Mean(List<VectorD3D> vectors)
         {
             VectorD3D meanVector = new VectorD3D(0, 0, 0);
