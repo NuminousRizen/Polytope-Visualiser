@@ -2,15 +2,23 @@
 
 namespace Util
 {
+    /// <summary>
+    /// A general utility library, contains a bundle of useful auxiliary functions.
+    /// </summary>
     public static class UtilLib
     {
-        /*
-         * return values:
-         * 0 = Collinear (points lie on a straight line)
-         * 1 = Clockwise turn
-         * -1 = CounterClockwise turn
-         */
-        private static int TurnDirection(VectorD2D a, VectorD2D b, VectorD2D c)
+        /// <summary>
+        /// Gives the "turn" that these three points make.
+        /// </summary>
+        /// <param name="a">The first point.</param>
+        /// <param name="b">The second point.</param>
+        /// <param name="c">The third point.</param>
+        /// <returns>
+        /// 0 = Collinear (points lie on a straight line)
+        /// 1 = Clockwise turn
+        /// -1 = CounterClockwise turn
+        /// </returns>
+        public static int TurnDirection(VectorD2D a, VectorD2D b, VectorD2D c)
         {
             double dir = (b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y);
             if (dir == 0) return 0;
@@ -18,7 +26,17 @@ namespace Util
             return -1;
         }
 
-        private static int SortByPolarAngle(VectorD2D p0, VectorD2D a, VectorD2D b)
+        /// <summary>
+        /// A sorting function to sort points by polar angle, i.e. sort points counter-clockwise (with respect to some point p0).
+        /// </summary>
+        /// <param name="p0">The reference point p0.</param>
+        /// <param name="a">The first point in the comparison.</param>
+        /// <param name="b">The first point in the comparison.</param>
+        /// <returns>
+        /// -1 = a comes before b
+        /// 1 = b comes before a
+        /// </returns>
+        public static int SortByPolarAngle(VectorD2D p0, VectorD2D a, VectorD2D b)
         {
             int turn = TurnDirection(p0, a, b);
             if (turn == 0)
@@ -30,7 +48,13 @@ namespace Util
             return turn;
         }
 
-        private static List<VectorD2D> RemoveSameAngle(List<VectorD2D> points, VectorD2D p0)
+        /// <summary>
+        /// Removes points with the same angle from a reference point p0.
+        /// </summary>
+        /// <param name="points">The list of points.</param>
+        /// <param name="p0">The reference point p0.</param>
+        /// <returns>A list of points without ones with the same angle.</returns>
+        public static List<VectorD2D> RemoveSameAngle(List<VectorD2D> points, VectorD2D p0)
         {
             List<VectorD2D> toReturn = new List<VectorD2D>();
 
@@ -45,6 +69,11 @@ namespace Util
             return toReturn;
         }
 
+        /// <summary>
+        /// Get the points from a set of faces.
+        /// </summary>
+        /// <param name="faces">The set of faces.</param>
+        /// <returns>All the points that are in the given faces (no duplicates).</returns>
         public static List<VectorD3D> GetPoints3DFromFaces(HashSet<Face> faces)
         {
             HashSet<VectorD3D> points = new HashSet<VectorD3D>();
@@ -59,9 +88,14 @@ namespace Util
             return new List<VectorD3D>(points);
         }
 
+        /// <summary>
+        /// Get the edges from a set of faces.
+        /// </summary>
+        /// <param name="faces">The set of faces.</param>
+        /// <returns>All the edges that are in the given faces (no duplicates)</returns>
         public static List<Edge> GetEdgesFromFaces(HashSet<Face> faces)
         {
-            HashSet<Edge> points = new HashSet<Edge>();
+            HashSet<Edge> points = new HashSet<Edge>(new EdgeEqualityComparer());
             foreach (Face face in faces)
             {
                 (Edge, Edge, Edge) facePoints = face.GetEdges();
@@ -73,6 +107,11 @@ namespace Util
             return new List<Edge>(points);
         }
 
+        /// <summary>
+        /// Get the points (2D) from a set of edges.
+        /// </summary>
+        /// <param name="edges">The set of edges.</param>
+        /// <returns>A list of points that are in the given edges (no duplicates)</returns>
         public static List<VectorD2D> GetPoints2DFromEdges(HashSet<Edge> edges)
         {
             HashSet<VectorD2D> points = new HashSet<VectorD2D>();
@@ -86,6 +125,11 @@ namespace Util
             return new List<VectorD2D>(points);
         }
         
+        /// <summary>
+        /// Get the points (2D) from a set of edges.
+        /// </summary>
+        /// <param name="edges">The set of edges.</param>
+        /// <returns>A list of points that are in the given edges (no duplicates)</returns>
         public static List<VectorD3D> GetPoints3DFromEdges(HashSet<Edge> edges)
         {
             HashSet<VectorD3D> points = new HashSet<VectorD3D>();
