@@ -1,4 +1,3 @@
-using UnityEngine;
 using Util;
 
 namespace Polytope2D.Util.Other
@@ -6,9 +5,7 @@ namespace Polytope2D.Util.Other
     // Holds an inequality in the form ax + by + c >= 0
     public struct Inequality
     {
-        private double _a;
-        private double _b;
-        private double _c;
+        private double _a, _b, _c;
     
         public Inequality(double a, double b, double c)
         {
@@ -34,12 +31,18 @@ namespace Polytope2D.Util.Other
 
         public bool IsWithinBounds(double x, double y)
         {
-            return _a * x + _b * y + _c >= 0;
+            return _a * x + _b * y + _c >= -VectorD2D.GetEpsilon();
         }
         
         public bool IsWithinBounds(VectorD2D point)
         {
-            return _a * point.x + _b * point.y + _c >= 0;
+            return _a * point.x + _b * point.y + _c >= -VectorD2D.GetEpsilon();
+        }
+
+        public bool IsOnInequalityLine(VectorD2D point)
+        {
+            return _a * point.x + _b * point.y + _c >= -VectorD2D.GetEpsilon() && 
+                   _a * point.x + _b * point.y + _c <= VectorD2D.GetEpsilon();
         }
     
         public VectorD2D GetIntersection(Inequality other)
@@ -48,6 +51,11 @@ namespace Polytope2D.Util.Other
             double y = (other.GetC() * _a - _c * other.GetA()) / (_b * other.GetA() - other.GetB() * _a);
 
             return new VectorD2D(x, y);
+        }
+
+        public override string ToString()
+        {
+            return "(" + _a + ")x + (" + _b + ")y + (" + _c + ") >= 0";
         }
 
         public string GetPrettyInequality()
@@ -60,13 +68,13 @@ namespace Polytope2D.Util.Other
             Inequality inequalityA;
             Inequality inequalityB;
             
-            if (pointA.y == pointB.y)
+            if (VectorD2D.YEquals(pointA, pointB))
             {
                 inequalityA = new Inequality(0, 1, -pointA.y);
                 inequalityB = new Inequality(0, -1, pointA.y);
             }
 
-            else if (pointA.x == pointB.x)
+            else if (VectorD2D.XEquals(pointA, pointB))
             {
                 inequalityA = new Inequality(1, 0, -pointA.x);
                 inequalityB = new Inequality(-1, 0, pointA.x);
