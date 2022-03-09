@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 using Util;
 
 namespace Polytope3D.Util.Convex_Hull
@@ -145,6 +146,11 @@ namespace Polytope3D.Util.Convex_Hull
 
             HashSet<VectorD3D> outsidePoints = new HashSet<VectorD3D>(pointsIn);
             HashSet<Face> convexHullFaces = new HashSet<Face>();
+
+            foreach (VectorD3D point in GetExtremePoints(pointsIn))
+            {
+                Debug.Log(point);
+            }
 
             // These are the initial 4 points that will make the initial tetrahedron.
             List<VectorD3D> initialPoints = GetInitialPoints(GetExtremePoints(pointsIn));

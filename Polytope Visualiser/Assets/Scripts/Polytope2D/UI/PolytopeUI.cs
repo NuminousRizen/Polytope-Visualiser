@@ -12,8 +12,6 @@ namespace Polytope2D.UI
     public class PolytopeUI : MonoBehaviour
     {
         public Theme2D theme;
-        
-        public List<VectorD2D> points;
 
         private Transform _convexHullPointsHolder;
         private Transform _otherPointsHolder;
@@ -66,32 +64,34 @@ namespace Polytope2D.UI
         private void Update()
         {
             HandleInput();
-            //BuildFromPoints();
-            BuildFromInequalities();
         }
 
         private void HandleInput()
         {
+            bool shiftDown = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
             Vector2 mouseScroll = Input.mouseScrollDelta;
-            if (mouseScroll.y != 0)
+            if (shiftDown)
             {
-                float change = mouseScroll.y * .1f;
-                Vector3 temp = transform.localScale + new Vector3(change, change, change);
-                if (temp != Vector3.zero)
+                if (mouseScroll.y != 0)
                 {
-                    transform.localScale = temp;
+                    float change = mouseScroll.y * .1f;
+                    Vector3 temp = transform.localScale + new Vector3(change, change, change);
+                    if (temp != Vector3.zero)
+                    {
+                        transform.localScale = temp;
+                    }
                 }
-            }
             
-            if (Input.GetMouseButton(0))
-            {
-                Vector3 temp = new Vector3(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
-                transform.localPosition += temp;
-            }
-            else if (Input.GetMouseButton(1))
-            {
-                _mousePos += new Vector2(Input.GetAxis("Mouse X"),-Input.GetAxis("Mouse Y")) * 2f;
-                transform.rotation = Quaternion.Euler(_mousePos.y, _mousePos.x, 0);
+                if (Input.GetMouseButton(0))
+                {
+                    Vector3 temp = new Vector3(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
+                    transform.localPosition += temp;
+                }
+                else if (Input.GetMouseButton(1))
+                {
+                    _mousePos += new Vector2(Input.GetAxis("Mouse X"),-Input.GetAxis("Mouse Y")) * 2f;
+                    transform.rotation = Quaternion.Euler(_mousePos.y, _mousePos.x, 0);
+                }
             }
 
             if (Input.GetKeyDown(KeyCode.F))
@@ -116,7 +116,7 @@ namespace Polytope2D.UI
             }
         }
 
-        private void Clear()
+        public void Clear()
         {
             foreach (Transform child in transform) {
                 Destroy(child.gameObject);
@@ -128,142 +128,109 @@ namespace Polytope2D.UI
             _convexHullPointsHolder.parent = _otherPointsHolder.parent = _linesHolder.parent = transform;
         }
 
-        void BuildFromPoints()
+        public void BuildFromPoints2D(List<VectorD3D> pointIn)
         {
-            if (Input.GetKeyDown(KeyCode.Space))
+            List<VectorD2D> points = new List<VectorD2D>();
+            foreach (VectorD3D point in pointIn)
             {
-                // ------- Testing 3D -------
-                List<VectorD3D> points3d = GenerateRandomPoints3D();
-                // points3d.Add(new VectorD3D(0, 0, 0));
-                // points3d.Add(new VectorD3D(0, 10, 0));
-                // points3d.Add(new VectorD3D(0, 10, 10));
-                // points3d.Add(new VectorD3D(0, 0, 10));
-                //
-                // points3d.Add(new VectorD3D(10, 0, 0));
-                // points3d.Add(new VectorD3D(10, 10, 0));
-                // points3d.Add(new VectorD3D(10, 10, 10));
-                // points3d.Add(new VectorD3D(10, 0, 10));
-
-                HashSet<Face> faces = Incremental3D.GetConvexHull(points3d);
-                // points3d = UtilLib.GetPoints3DFromFaces(faces);
-                // foreach (VectorD3D point in points3d)
-                // {
-                //     print(point);
-                // }
-                BuildPolytope3D(faces, points3d);
-                // // --------------------------
-
-                // points = GenerateRandomPoints();
-                // BuildPolytope(UtilLib.SortPoints2DCounterClockwise(Incremental.GetConvexHull(points)));
+                points.Add(point);
             }
+            
+            BuildPolytope2D(GrahamScan.GetConvexHull(points), points);
         }
 
-        void BuildFromInequalities()
+        public void BuildFromPoints3D(List<VectorD3D> pointsIn)
         {
-            if (Input.GetKeyDown(KeyCode.Space))
+            BuildPolytope3D(Incremental3D.GetConvexHull(pointsIn), pointsIn);
+        }
+
+        public void BuildFromInequalities2D(List<Inequality> inequalities)
+        {
+            List<VectorD2D> points = new List<VectorD2D>();
+
+            List<VectorD2D> intersectionPoints = new List<VectorD2D>();
+            for (int i = 0; i < inequalities.Count; i++)
             {
-                // points = new List<VectorD2D>();
-                // List<Inequality> inequalities = new List<Inequality>();
-                //
-                // // A square
-                // // inequalities.Add(new Inequality(0, 1, 2.5f));
-                // // inequalities.Add(new Inequality(1, 0,2.5f));
-                // // inequalities.Add(new Inequality(0, -1, 2.5f));
-                // // inequalities.Add(new Inequality(-1, 0, 2.5f));
-                //
-                // inequalities.Add(new Inequality(-0.3960672, -1, 2.081373));
-                // inequalities.Add(new Inequality(-0.07919004, -1,1.726297));
-                // inequalities.Add(new Inequality(0.2678808, 1, -1.393981));
-                //
-                // List<VectorD2D> intersectionPoints = new List<VectorD2D>();
-                // for (int i = 0; i < inequalities.Count; i++)
-                // {
-                //     Inequality currentInequality = inequalities[i];
-                //     
-                //     for (int j = i + 1; j < inequalities.Count; j++)
-                //     {
-                //         intersectionPoints.Add(currentInequality.GetIntersection(inequalities[j]));
-                //     }
-                // }
-                //
-                // for (int i = 0; i < intersectionPoints.Count; i++)
-                // {
-                //     VectorD2D currentPoint = intersectionPoints[i];
-                //     bool satisfiesAll = true;
-                //     for (int j = 0; j < inequalities.Count; j++)
-                //     {
-                //         if (!inequalities[j].IsWithinBounds(currentPoint))
-                //         {
-                //             satisfiesAll = false;
-                //             break;
-                //         }
-                //     }
-                //
-                //     if (satisfiesAll)
-                //     {
-                //         points.Add(currentPoint);
-                //     }
-                // }
-                // BuildPolytope(GrahamScan.GetConvexHull(points));
+                Inequality currentInequality = inequalities[i];
                 
-                // ------------- Testing 3D ------------- //
-                List<PlaneInequality> planes = new List<PlaneInequality>
+                for (int j = i + 1; j < inequalities.Count; j++)
                 {
-                    new PlaneInequality(0,0,-1,5),
-                    new PlaneInequality(0,-1,0,5),
-                    new PlaneInequality(-1,0,0,5),
-
-                    new PlaneInequality(1,0,0,0),
-                    new PlaneInequality(0,0,1,0),
-                    new PlaneInequality(0,1,0,0)
-                };
-
-                HashSet<VectorD3D> intersectionPoints = new HashSet<VectorD3D>();
-
-                for (int i = 0; i < planes.Count; i++)
+                    intersectionPoints.Add(currentInequality.GetIntersection(inequalities[j]));
+                }
+            }
+            
+            for (int i = 0; i < intersectionPoints.Count; i++)
+            {
+                VectorD2D currentPoint = intersectionPoints[i];
+                bool satisfiesAll = true;
+                for (int j = 0; j < inequalities.Count; j++)
                 {
-                    for (int j = 0; j < planes.Count; j++)
+                    if (!inequalities[j].IsWithinBounds(currentPoint))
                     {
-                        if (i != j)
+                        satisfiesAll = false;
+                        break;
+                    }
+                }
+            
+                if (satisfiesAll)
+                {
+                    points.Add(currentPoint);
+                }
+            }
+            BuildPolytope2D(GrahamScan.GetConvexHull(points), points);
+        }
+
+        public void BuildFromInequalities3D(List<PlaneInequality> planes)
+        {
+            HashSet<VectorD3D> intersectionPoints = new HashSet<VectorD3D>();
+
+            for (int i = 0; i < planes.Count; i++)
+            {
+                for (int j = 0; j < planes.Count; j++)
+                {
+                    if (i != j)
+                    {
+                        for (int k = 0; k < planes.Count; k++)
                         {
-                            for (int k = 0; k < planes.Count; k++)
+                            if (k != i && k != j)
                             {
-                                if (k != i && k != j)
+                                VectorD3D? intersectionPoint = PlaneInequality.GetIntersection(
+                                    planes[i],
+                                    planes[j],
+                                    planes[k]
+                                );
+                                if (intersectionPoint != null)
                                 {
-                                    VectorD3D? intersectionPoint = PlaneInequality.GetIntersection(
-                                        planes[i],
-                                        planes[j],
-                                        planes[k]
-                                    );
-                                    if (intersectionPoint != null)
-                                    {
-                                        intersectionPoints.Add(intersectionPoint.Value);
-                                    }
+                                    intersectionPoints.Add(intersectionPoint.Value);
                                 }
                             }
                         }
                     }
                 }
-
-                List<VectorD3D> points3D = new List<VectorD3D>();
-                foreach (VectorD3D point in intersectionPoints)
-                {
-                    bool isValid = true;
-                    foreach (PlaneInequality plane in planes)
-                    {
-                        if (!plane.IsWithinBounds(point))
-                        {
-                            isValid = false;
-                            break;
-                        }
-                    }
-                    
-                    if (isValid) points3D.Add(point);
-                }
-                HashSet<Face> faces = Incremental3D.GetConvexHull(points3D);
-                BuildPolytope3D(faces, points3D);
-                // ------------------------------------- //
             }
+
+            List<VectorD3D> points3D = new List<VectorD3D>();
+            foreach (VectorD3D point in intersectionPoints)
+            {
+                bool isValid = true;
+                foreach (PlaneInequality plane in planes)
+                {
+                    if (!plane.IsWithinBounds(point))
+                    {
+                        isValid = false;
+                        break;
+                    }
+                }
+                    
+                if (isValid) points3D.Add(point);
+            }
+
+            foreach (VectorD3D point in points3D)
+            {
+                print(point);
+            }
+            HashSet<Face> faces = Incremental3D.GetConvexHull(points3D);
+            BuildPolytope3D(faces, points3D);
         }
 
         private void BuildPolytope3D(HashSet<Face> faces, List<VectorD3D> allPoints)
@@ -333,15 +300,15 @@ namespace Polytope2D.UI
             }
         }
 
-        private void BuildPolytope(List<VectorD2D> convexHullPoints)
+        private void BuildPolytope2D(List<VectorD2D> convexHullPoints, List<VectorD2D> points)
         {
             Clear();
-            BuildPoints(convexHullPoints);
+            BuildPoints(convexHullPoints, points);
             BuildLines(convexHullPoints);
             BuildPolytopeMesh(convexHullPoints);
         }
 
-        private void BuildPoints(List<VectorD2D> convexHullPoints)
+        private void BuildPoints(List<VectorD2D> convexHullPoints, List<VectorD2D> points)
         {
             foreach (VectorD2D point in points)
             {

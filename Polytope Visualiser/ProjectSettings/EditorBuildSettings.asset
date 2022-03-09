@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/PolytopeScene.unity
+    guid: cbf33564b612e9b459c5ae83fc66f830
   m_configObjects: {}
