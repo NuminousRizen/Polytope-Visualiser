@@ -86,6 +86,7 @@ namespace UI.GUI
             }
             
             Inputs.Clear();
+            PolytopeDisplay.Clear();
         }
 
         public void Build()

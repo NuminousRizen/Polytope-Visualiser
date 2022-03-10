@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Polytope2D.Util.Other;
 using Polytope2D.Util.Triangulation;
@@ -14,16 +13,13 @@ namespace Polytope2D.UI
     public class PolytopeUI : MonoBehaviour
     {
         public Theme2D theme;
+        public GameObject tooltipDisplay;
 
         private Transform _convexHullPointsHolder;
         private Transform _otherPointsHolder;
         private Transform _linesHolder;
 
         private Vector2 _mousePos;
-
-        private Camera mainCamera;
-
-        private double currentMaxDistance = 0;
 
         private static List<VectorD2D> GenerateRandomPoints()
         {
@@ -67,11 +63,6 @@ namespace Polytope2D.UI
             return generatedPoints;
         }
 
-        public void Start()
-        {
-            mainCamera = Camera.main;
-        }
-
         public void Update()
         {
             HandleInput();
@@ -79,38 +70,9 @@ namespace Polytope2D.UI
 
         private void HandleInput()
         {
-            bool shiftDown = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
-            Vector2 mouseScroll = Input.mouseScrollDelta;
-            if (shiftDown)
+            if (Input.GetKeyDown(KeyCode.T))
             {
-                if (mouseScroll.y != 0)
-                {
-                    float change = mouseScroll.y * .1f / transform.localScale.x;
-                    Vector3 temp = transform.localScale + new Vector3(change, change, change);
-                    if (temp != Vector3.zero)
-                    {
-                        transform.localScale = temp;
-                    }
-                }
-            
-                if (Input.GetMouseButton(0))
-                {
-                    Vector3 temp = new Vector3(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
-                    transform.localPosition += temp;
-                }
-                else if (Input.GetMouseButton(1))
-                {
-                    _mousePos += new Vector2(Input.GetAxis("Mouse X"),-Input.GetAxis("Mouse Y")) * 2f;
-                    transform.rotation = Quaternion.Euler(_mousePos.y, _mousePos.x, 0);
-                }
-            }
-
-            if (Input.GetKeyDown(KeyCode.F))
-            {
-                transform.position = Vector3.zero;
-                transform.rotation = Quaternion.identity;
-                transform.localScale = Vector3.one;
-                _mousePos = Vector2.zero;
+                tooltipDisplay.SetActive(!tooltipDisplay.activeSelf);
             }
         }
 
@@ -135,11 +97,15 @@ namespace Polytope2D.UI
             }
 
             BuildPolytope2D(GrahamScan.GetConvexHull(points), points);
+            Vector3 centrePoint = VectorD3D.Mean(pointsIn).ToVector3();
+            transform.localPosition = -centrePoint;
         }
 
         public void BuildFromPoints3D(List<VectorD3D> pointsIn)
         {
             BuildPolytope3D(Incremental3D.GetConvexHull(pointsIn), pointsIn);
+            Vector3 centrePoint = VectorD3D.Mean(pointsIn).ToVector3();
+            transform.localPosition = -centrePoint;
         }
 
         public void BuildFromInequalities2D(List<Inequality> inequalities)
@@ -176,6 +142,8 @@ namespace Polytope2D.UI
                 }
             }
             BuildPolytope2D(GrahamScan.GetConvexHull(points), points);
+            VectorD3D centrePoint = VectorD2D.Mean(points);
+            transform.localPosition = -centrePoint.ToVector3();
         }
 
         public void BuildFromInequalities3D(List<PlaneInequality> planes)
@@ -225,6 +193,8 @@ namespace Polytope2D.UI
             
             HashSet<Face> faces = Incremental3D.GetConvexHull(points3D);
             BuildPolytope3D(faces, points3D);
+            Vector3 centrePoint = VectorD3D.Mean(points3D).ToVector3();
+            transform.localPosition = -centrePoint;
         }
 
         private void BuildPolytope3D(HashSet<Face> faces, List<VectorD3D> allPoints)
