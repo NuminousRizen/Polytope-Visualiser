@@ -22,6 +22,8 @@ namespace UI.GUI
 
         public GameObject InputPanel;
 
+        public GameObject AlertBox;
+
         public PolytopeUI PolytopeDisplay;
 
         private List<GameObject> Inputs = new List<GameObject>();
@@ -90,78 +92,85 @@ namespace UI.GUI
         {
             PolytopeDisplay.Clear();
             // Building with points
-            if (InputMode.value == 0)
+            try
             {
-                List<VectorD3D> points = new List<VectorD3D>();
-
-                foreach (GameObject input in Inputs)
+                if (InputMode.value == 0)
                 {
-                    List<double> values = new List<double>();
-                    foreach (Transform inputField in input.transform.GetChild(0).GetChild(0))
+                    List<VectorD3D> points = new List<VectorD3D>();
+
+                    foreach (GameObject input in Inputs)
                     {
-                        string userInput = inputField.GetComponent<TMP_InputField>().text;
-                        values.Add(Convert.ToDouble(userInput));
+                        List<double> values = new List<double>();
+                        foreach (Transform inputField in input.transform.GetChild(0).GetChild(0))
+                        {
+                            string userInput = inputField.GetComponent<TMP_InputField>().text;
+                            values.Add(Convert.ToDouble(userInput));
+                        }
+
+                        // In 2D mode
+                        if (Mode.value == 0)
+                        {
+                            values.Add(0);
+                        }
+                        
+                        points.Add(new VectorD3D(values[0], values[1], values[2]));
                     }
 
+                    if (Mode.value == 0)
+                    { 
+                        PolytopeDisplay.BuildFromPoints2D(points);
+                    }
+                    else if (Mode.value == 1)
+                    { 
+                        PolytopeDisplay.BuildFromPoints3D(points);
+                    }
+                }
+            
+                // Building with inequalities
+                else if (InputMode.value == 1)
+                {
                     // In 2D mode
                     if (Mode.value == 0)
                     {
-                        values.Add(0);
+                        List<Inequality> inequalities = new List<Inequality>();
+
+                        foreach (GameObject input in Inputs)
+                        {
+                            List<double> values = new List<double>();
+                            foreach (Transform inputField in input.transform.GetChild(0).GetChild(0))
+                            {
+                                string userInput = inputField.GetComponent<TMP_InputField>().text;
+                                values.Add(Convert.ToDouble(userInput));
+                            }
+
+                            inequalities.Add(new Inequality(values[0], values[1], values[2]));
+                        }
+                        
+                        PolytopeDisplay.BuildFromInequalities2D(inequalities);
                     }
                     
-                    points.Add(new VectorD3D(values[0], values[1], values[2]));
-                }
+                    else if (Mode.value == 1)
+                    {
+                        List<PlaneInequality> inequalities = new List<PlaneInequality>();
+                        foreach (GameObject input in Inputs)
+                        {
+                            List<double> values = new List<double>();
+                            foreach (Transform inputField in input.transform.GetChild(0).GetChild(0))
+                            {
+                                string userInput = inputField.GetComponent<TMP_InputField>().text;
+                                values.Add(Convert.ToDouble(userInput));
+                            }
 
-                if (Mode.value == 0)
-                {
-                    PolytopeDisplay.BuildFromPoints2D(points);
-                }
-                else if (Mode.value == 1)
-                {
-                    PolytopeDisplay.BuildFromPoints3D(points);
+                            inequalities.Add(new PlaneInequality(values[0], values[1], values[2], values[3]));
+                        }
+                        
+                        PolytopeDisplay.BuildFromInequalities3D(inequalities);
+                    }
                 }
             }
-            
-            // Building with inequalities
-            else if (InputMode.value == 1)
+            catch
             {
-                // In 2D mode
-                if (Mode.value == 0)
-                {
-                    List<Inequality> inequalities = new List<Inequality>();
-
-                    foreach (GameObject input in Inputs)
-                    {
-                        List<double> values = new List<double>();
-                        foreach (Transform inputField in input.transform.GetChild(0).GetChild(0))
-                        {
-                            string userInput = inputField.GetComponent<TMP_InputField>().text;
-                            values.Add(Convert.ToDouble(userInput));
-                        }
-
-                        inequalities.Add(new Inequality(values[0], values[1], values[2]));
-                    }
-                    
-                    PolytopeDisplay.BuildFromInequalities2D(inequalities);
-                }
-                
-                else if (Mode.value == 1)
-                {
-                    List<PlaneInequality> inequalities = new List<PlaneInequality>();
-                    foreach (GameObject input in Inputs)
-                    {
-                        List<double> values = new List<double>();
-                        foreach (Transform inputField in input.transform.GetChild(0).GetChild(0))
-                        {
-                            string userInput = inputField.GetComponent<TMP_InputField>().text;
-                            values.Add(Convert.ToDouble(userInput));
-                        }
-
-                        inequalities.Add(new PlaneInequality(values[0], values[1], values[2], values[3]));
-                    }
-                    
-                    PolytopeDisplay.BuildFromInequalities3D(inequalities);
-                }
+                AlertBox.GetComponent<AlertBox>().DisplayMessage("Could not build polytope with given inputs");
             }
         }
     }

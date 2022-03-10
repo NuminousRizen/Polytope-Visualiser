@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Util;
 
 namespace Polytope2D.Util.Convex_Hull
@@ -56,7 +57,7 @@ namespace Polytope2D.Util.Convex_Hull
 
         public static List<VectorD2D> GetConvexHull(List<VectorD2D> pointsIn)
         {
-            if (pointsIn.Count < 4) return pointsIn;
+            if (pointsIn.Count < 3) throw new Exception("Cannot build a convex hull with less than 3 points.");
             List<VectorD2D> points = new List<VectorD2D>(pointsIn);
             Stack<VectorD2D> convexHullPoints = new Stack<VectorD2D>();
 

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Polytope2D.Util.Other;
 using Polytope2D.Util.Triangulation;
@@ -6,6 +7,7 @@ using Polytope3D.Util.Convex_Hull;
 using UI.Tooltip;
 using UnityEngine;
 using Util;
+using Random = UnityEngine.Random;
 
 namespace Polytope2D.UI
 {
@@ -18,6 +20,10 @@ namespace Polytope2D.UI
         private Transform _linesHolder;
 
         private Vector2 _mousePos;
+
+        private Camera mainCamera;
+
+        private double currentMaxDistance = 0;
 
         private static List<VectorD2D> GenerateRandomPoints()
         {
@@ -61,7 +67,12 @@ namespace Polytope2D.UI
             return generatedPoints;
         }
 
-        private void Update()
+        public void Start()
+        {
+            mainCamera = Camera.main;
+        }
+
+        public void Update()
         {
             HandleInput();
         }
@@ -74,7 +85,7 @@ namespace Polytope2D.UI
             {
                 if (mouseScroll.y != 0)
                 {
-                    float change = mouseScroll.y * .1f;
+                    float change = mouseScroll.y * .1f / transform.localScale.x;
                     Vector3 temp = transform.localScale + new Vector3(change, change, change);
                     if (temp != Vector3.zero)
                     {
@@ -101,19 +112,6 @@ namespace Polytope2D.UI
                 transform.localScale = Vector3.one;
                 _mousePos = Vector2.zero;
             }
-
-            if (Input.GetKeyDown(KeyCode.A))
-            {
-                foreach (Transform point in _convexHullPointsHolder.transform)
-                {
-                    print(point.name);
-                }
-                
-                foreach (Transform point in _otherPointsHolder.transform)
-                {
-                    print(point.name);
-                }
-            }
         }
 
         public void Clear()
@@ -128,14 +126,14 @@ namespace Polytope2D.UI
             _convexHullPointsHolder.parent = _otherPointsHolder.parent = _linesHolder.parent = transform;
         }
 
-        public void BuildFromPoints2D(List<VectorD3D> pointIn)
+        public void BuildFromPoints2D(List<VectorD3D> pointsIn)
         {
             List<VectorD2D> points = new List<VectorD2D>();
-            foreach (VectorD3D point in pointIn)
+            foreach (VectorD3D point in pointsIn)
             {
                 points.Add(point);
             }
-            
+
             BuildPolytope2D(GrahamScan.GetConvexHull(points), points);
         }
 
@@ -224,11 +222,7 @@ namespace Polytope2D.UI
                     
                 if (isValid) points3D.Add(point);
             }
-
-            foreach (VectorD3D point in points3D)
-            {
-                print(point);
-            }
+            
             HashSet<Face> faces = Incremental3D.GetConvexHull(points3D);
             BuildPolytope3D(faces, points3D);
         }
@@ -237,8 +231,14 @@ namespace Polytope2D.UI
         {
             Clear();
             HashSet<Edge> edges = new HashSet<Edge>(UtilLib.GetEdgesFromFaces(faces), new EdgeEqualityComparer());
-            HashSet<VectorD3D> points3D = new HashSet<VectorD3D>(UtilLib.GetPoints3DFromEdges(edges));
+            List<VectorD3D> points3D = UtilLib.GetPoints3DFromEdges(edges);
+            BuildPoints3D(points3D, allPoints);
+            BuildLines3D(edges);
+            BuildFaces3D(faces);
+        }
 
+        private void BuildPoints3D(List<VectorD3D> points3D, List<VectorD3D> allPoints)
+        {
             foreach (VectorD3D point in allPoints)
             {
                 Transform pointObject = Instantiate(theme.pointPrefab, point.ToVector3(), transform.rotation);
@@ -260,7 +260,10 @@ namespace Polytope2D.UI
                 TooltipTrigger tooltipTrigger = pointObject.gameObject.AddComponent<TooltipTrigger>();
                 tooltipTrigger.toShow = "x: " + point.x + " ; y: " + point.y + "; z: " + point.z;
             }
+        }
 
+        private void BuildLines3D(HashSet<Edge> edges)
+        {
             foreach (Edge edge in edges)
             {
                 (VectorD3D, VectorD3D) edgePoints = edge.GetPoints();
@@ -276,7 +279,10 @@ namespace Polytope2D.UI
                 lineRenderer.positionCount = 2;
                 lineRenderer.SetPositions(new Vector3[] { edgePoints.Item1.ToVector3(), edgePoints.Item2.ToVector3() });
             }
+        }
 
+        private void BuildFaces3D(HashSet<Face> faces)
+        {
             foreach (Face face in faces)
             {
                 (VectorD3D, VectorD3D, VectorD3D) facePoints = face.GetPoints();
@@ -303,12 +309,12 @@ namespace Polytope2D.UI
         private void BuildPolytope2D(List<VectorD2D> convexHullPoints, List<VectorD2D> points)
         {
             Clear();
-            BuildPoints(convexHullPoints, points);
-            BuildLines(convexHullPoints);
-            BuildPolytopeMesh(convexHullPoints);
+            BuildPoints2D(convexHullPoints, points);
+            BuildLines2D(convexHullPoints);
+            BuildPolytopeMesh2D(convexHullPoints);
         }
 
-        private void BuildPoints(List<VectorD2D> convexHullPoints, List<VectorD2D> points)
+        private void BuildPoints2D(List<VectorD2D> convexHullPoints, List<VectorD2D> points)
         {
             foreach (VectorD2D point in points)
             {
@@ -334,7 +340,7 @@ namespace Polytope2D.UI
             }
         }
 
-        private void BuildLines(List<VectorD2D> convexHullPoints)
+        private void BuildLines2D(List<VectorD2D> convexHullPoints)
         {
             for (int i = 0; i < convexHullPoints.Count; i++)
             {
@@ -367,7 +373,7 @@ namespace Polytope2D.UI
             }
         }
 
-        private void BuildPolytopeMesh(List<VectorD2D> convexHullPoints)
+        private void BuildPolytopeMesh2D(List<VectorD2D> convexHullPoints)
         {
             List<Vector3> toDisplay = new List<Vector3>();
             foreach (VectorD2D point in convexHullPoints)
