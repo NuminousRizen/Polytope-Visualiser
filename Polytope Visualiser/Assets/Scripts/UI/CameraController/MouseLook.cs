@@ -24,4 +24,10 @@ public class MouseLook : MonoBehaviour
             characterBody.Rotate(Vector3.up * mouseX);
         }
     }
+
+    public void Clear()
+    {
+        xRotation = 0f;
+        transform.localRotation = Quaternion.identity;
+    }
 }

@@ -4,6 +4,8 @@ public class CharacterMovement : MonoBehaviour
 {
     public CharacterController controller;
 
+    public Camera camera;
+
     public float speed = 12f;
 
     void Start()
@@ -28,9 +30,10 @@ public class CharacterMovement : MonoBehaviour
         if (Input.GetKey(KeyCode.F))
         {
             controller.enabled = false;
-            transform.position = Vector3.zero;
+            transform.position = new Vector3(0f,0f,-10f);
             controller.enabled = true;
             transform.rotation = Quaternion.identity;
+            camera.GetComponent<MouseLook>().Clear();
         }
 
         Vector3 move = transform.right * x + transform.forward * z + transform.up * y;

@@ -2660,6 +2660,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   controller: {fileID: 1030882145}
+  camera: {fileID: 1737136461}
   speed: 12
 --- !u!1 &1039377246
 GameObject:
