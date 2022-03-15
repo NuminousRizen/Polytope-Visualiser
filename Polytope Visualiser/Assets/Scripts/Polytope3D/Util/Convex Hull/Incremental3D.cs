@@ -126,6 +126,7 @@ namespace Polytope3D.Util.Convex_Hull
                     if (face.IsVisible(point))
                     {
                         outsidePoints.Add(point);
+                        break;
                     }
                 }
             }

@@ -161,5 +161,22 @@ namespace Util
 
             return points;
         }
+
+        public static HashSet<List<VectorD4D>> GetSubFacets(HashSet<HyperFacet> hyperFacets)
+        {
+            HashSet<List<VectorD4D>> subFacets = new HashSet<List<VectorD4D>>();
+
+            foreach (HyperFacet facet in hyperFacets)
+            {
+                foreach (List<VectorD4D> subFacet in facet.subFacets)
+                {
+                    subFacets.Add(subFacet);
+                }
+            }
+
+            return subFacets;
+        }
+        
+        
     }
 }

@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using Polytope2D.Util.Other;
 using Polytope2D.Util.Triangulation;
-using Polytope2D.Util.Convex_Hull;
 using Polytope3D.Util.Convex_Hull;
+using Polytope4D;
 using UI.Tooltip;
 using UnityEngine;
 using Util;
@@ -263,6 +263,52 @@ namespace Polytope2D.UI
                 HashSet<Face> faces = Incremental3D.GetConvexHull(points3D);
                 BuildPolytope3D(faces, points3D);
                 // ------------------------------------- //
+                
+                
+                List<VectorD4D> points4D = new List<VectorD4D>();
+                points4D.Add(new VectorD4D(1,0,0,0));
+                points4D.Add(new VectorD4D(0,1,0,0));
+                points4D.Add(new VectorD4D(0,1,1,0));
+                points4D.Add(new VectorD4D(1,1,1,0));
+                points4D.Add(new VectorD4D(1,1,1,1));
+                
+                points4D.Add(new VectorD4D(0,0,0,0));
+                points4D.Add(new VectorD4D(1,1,0,0));
+                
+                points4D.Add(new VectorD4D(0,0,1,0));
+                points4D.Add(new VectorD4D(1,0,1,0));
+                
+                points4D.Add(new VectorD4D(.5,.5,.5,.5));
+                
+                points4D.Add(new VectorD4D(0,0,0,1));
+                points4D.Add(new VectorD4D(1,0,0,1));
+                points4D.Add(new VectorD4D(0,1,0,1));
+                points4D.Add(new VectorD4D(1,1,0,1));
+                
+                points4D.Add(new VectorD4D(0,0,1,1));
+                points4D.Add(new VectorD4D(1,0,1,1));
+                points4D.Add(new VectorD4D(0,1,1,1));
+                
+                // points4D.Add(new VectorD4D(0,0,0,0));
+                // points4D.Add(new VectorD4D(1,1,0,0));
+                // points4D.Add(new VectorD4D(1,0,1,0));
+                // points4D.Add(new VectorD4D(1,0,0,0));
+                // points4D.Add(new VectorD4D(1,1,1,1));
+
+                HashSet<HyperFacet> hyperFacets = Incremental4D.GetConvexHull(points4D);
+                
+                print(hyperFacets.Count);
+
+                HashSet<VectorD4D> pointsD4Ds = new HashSet<VectorD4D>();
+                foreach (HyperFacet hyperFacet in hyperFacets)
+                {
+                    foreach (VectorD4D subFacet in hyperFacet.vertices)
+                    {
+                        pointsD4Ds.Add(subFacet);
+                    }
+                }
+
+                print(pointsD4Ds.Count);
             }
         }
 
