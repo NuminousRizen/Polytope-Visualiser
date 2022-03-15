@@ -21,6 +21,10 @@ namespace Polytope2D.UI
 
         private Vector2 _mousePos;
 
+        /// <summary>
+        /// Generates some random points (2D).
+        /// </summary>
+        /// <returns>List of randomly generated points.</returns>
         private static List<VectorD2D> GenerateRandomPoints()
         {
             Camera camera = Camera.main;
@@ -42,6 +46,10 @@ namespace Polytope2D.UI
             return generatedPoints;
         }
         
+        /// <summary>
+        /// Generates some random points (3D).
+        /// </summary>
+        /// <returns>List of randomly generated points.</returns>
         private static List<VectorD3D> GenerateRandomPoints3D()
         {
             Camera camera = Camera.main;
@@ -70,14 +78,21 @@ namespace Polytope2D.UI
 
         private void HandleInput()
         {
+            // Disable tooltip.
             if (Input.GetKeyDown(KeyCode.T))
             {
                 tooltipDisplay.SetActive(!tooltipDisplay.activeSelf);
             }
         }
 
+        /// <summary>
+        /// Clears/ resets the polytope UI.
+        /// </summary>
         public void Clear()
         {
+            transform.position = Vector3.zero;
+            transform.rotation = Quaternion.identity;
+
             foreach (Transform child in transform) {
                 Destroy(child.gameObject);
             }
@@ -88,6 +103,10 @@ namespace Polytope2D.UI
             _convexHullPointsHolder.parent = _otherPointsHolder.parent = _linesHolder.parent = transform;
         }
 
+        /// <summary>
+        /// Builds polytope (2D) from points.
+        /// </summary>
+        /// <param name="pointsIn">The list of points.</param>
         public void BuildFromPoints2D(List<VectorD3D> pointsIn)
         {
             List<VectorD2D> points = new List<VectorD2D>();
@@ -101,6 +120,10 @@ namespace Polytope2D.UI
             transform.localPosition = -centrePoint;
         }
 
+        /// <summary>
+        /// Builds polytope (3D) from points.
+        /// </summary>
+        /// <param name="pointsIn">The list of points.</param>
         public void BuildFromPoints3D(List<VectorD3D> pointsIn)
         {
             BuildPolytope3D(Incremental3D.GetConvexHull(pointsIn), pointsIn);
@@ -108,6 +131,10 @@ namespace Polytope2D.UI
             transform.localPosition = -centrePoint;
         }
 
+        /// <summary>
+        /// Builds polytope (2D) from equations.
+        /// </summary>
+        /// <param name="inequalities">The list of equations.</param>
         public void BuildFromInequalities2D(List<Inequality> inequalities)
         {
             List<VectorD2D> points = new List<VectorD2D>();
@@ -146,6 +173,10 @@ namespace Polytope2D.UI
             transform.localPosition = -centrePoint.ToVector3();
         }
 
+        /// <summary>
+        /// Builds polytope (3D) from equations.
+        /// </summary>
+        /// <param name="planes">The list of equations.</param>
         public void BuildFromInequalities3D(List<PlaneInequality> planes)
         {
             HashSet<VectorD3D> intersectionPoints = new HashSet<VectorD3D>();
@@ -197,6 +228,11 @@ namespace Polytope2D.UI
             transform.localPosition = -centrePoint;
         }
 
+        /// <summary>
+        /// Builds a 3D polytope.
+        /// </summary>
+        /// <param name="faces">The set of faces.</param>
+        /// <param name="allPoints">The set of all points (whether on convex hull or not).</param>
         private void BuildPolytope3D(HashSet<Face> faces, List<VectorD3D> allPoints)
         {
             Clear();
@@ -207,6 +243,11 @@ namespace Polytope2D.UI
             BuildFaces3D(faces);
         }
 
+        /// <summary>
+        /// Builds the points.
+        /// </summary>
+        /// <param name="points3D">The list of points on the convex hull.</param>
+        /// <param name="allPoints">The list of all points.</param>
         private void BuildPoints3D(List<VectorD3D> points3D, List<VectorD3D> allPoints)
         {
             foreach (VectorD3D point in allPoints)
@@ -232,6 +273,10 @@ namespace Polytope2D.UI
             }
         }
 
+        /// <summary>
+        /// Builds the lines/ edges to be displayed.
+        /// </summary>
+        /// <param name="edges">The set of edges to be displayed.</param>
         private void BuildLines3D(HashSet<Edge> edges)
         {
             foreach (Edge edge in edges)
@@ -251,6 +296,10 @@ namespace Polytope2D.UI
             }
         }
 
+        /// <summary>
+        /// Builds the faces of the polytope.
+        /// </summary>
+        /// <param name="faces">The set of faces.</param>
         private void BuildFaces3D(HashSet<Face> faces)
         {
             foreach (Face face in faces)
@@ -276,6 +325,11 @@ namespace Polytope2D.UI
             }
         }
 
+        /// <summary>
+        /// Builds a 2D polytope. 
+        /// </summary>
+        /// <param name="convexHullPoints">The set of points on the convex hull (extreme points).</param>
+        /// <param name="points">The set of all points (whether on convex hull or not).</param>
         private void BuildPolytope2D(List<VectorD2D> convexHullPoints, List<VectorD2D> points)
         {
             Clear();
@@ -284,6 +338,11 @@ namespace Polytope2D.UI
             BuildPolytopeMesh2D(convexHullPoints);
         }
 
+        /// <summary>
+        /// Builds the points.
+        /// </summary>
+        /// <param name="convexHullPoints">The set of points on the convex hull.</param>
+        /// <param name="points">The set of all points (whether on hull or not).</param>
         private void BuildPoints2D(List<VectorD2D> convexHullPoints, List<VectorD2D> points)
         {
             foreach (VectorD2D point in points)
@@ -310,6 +369,10 @@ namespace Polytope2D.UI
             }
         }
 
+        /// <summary>
+        /// Builds the lines/ edges to be displayed.
+        /// </summary>
+        /// <param name="convexHullPoints">The set of points on the convex hull.</param>
         private void BuildLines2D(List<VectorD2D> convexHullPoints)
         {
             for (int i = 0; i < convexHullPoints.Count; i++)
@@ -343,6 +406,10 @@ namespace Polytope2D.UI
             }
         }
 
+        /// <summary>
+        /// Builds the mesh of the polytope (2D).
+        /// </summary>
+        /// <param name="convexHullPoints">The set of points on the convex hull.</param>
         private void BuildPolytopeMesh2D(List<VectorD2D> convexHullPoints)
         {
             List<Vector3> toDisplay = new List<Vector3>();

@@ -142,24 +142,5 @@ namespace Util
 
             return new List<VectorD3D>(points);
         }
-
-        public static List<VectorD2D> SortPoints2DCounterClockwise(List<VectorD2D> points)
-        {
-            VectorD2D p0 = points[0];
-            for (int i = 1; i < points.Count; i++)
-            {
-                VectorD2D p = points[i];
-                if (VectorD2D.YEquals(p0, p) && p.x < p0.x) p0 = p;
-                if (p.y < p0.y) p0 = p;
-            }
-
-            points.Remove(p0);
-            
-            points.Sort((a, b) => SortByPolarAngle(p0, a, b));
-            points = RemoveSameAngle(points, p0);
-            points.Insert(0, p0);
-
-            return points;
-        }
     }
 }

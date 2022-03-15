@@ -26,8 +26,13 @@ namespace UI.GUI
 
         public PolytopeUI PolytopeDisplay;
 
+        public CharacterMovement MovementController;
+
         private List<GameObject> Inputs = new List<GameObject>();
 
+        /// <summary>
+        /// Adds an appropriate input label to the inputs holder.
+        /// </summary>
         public void AddInput()
         {
             // In 2D mode
@@ -72,12 +77,19 @@ namespace UI.GUI
             }
         }
 
+        /// <summary>
+        /// Removes a specified input label from the input holder.
+        /// </summary>
+        /// <param name="toRemove">The input label to be removed.</param>
         public void RemoveInput(GameObject toRemove)
         {
             Inputs.Remove(toRemove);
             Destroy(toRemove);
         }
 
+        /// <summary>
+        /// Resets everything.
+        /// </summary>
         public void Clear()
         {
             foreach (GameObject input in Inputs)
@@ -87,11 +99,15 @@ namespace UI.GUI
             
             Inputs.Clear();
             PolytopeDisplay.Clear();
+            MovementController.Clear();
         }
 
+        /// <summary>
+        /// Build the polytope with the given settings.
+        /// </summary>
         public void Build()
         {
-            PolytopeDisplay.Clear();
+            Clear();
             // Building with points
             try
             {
