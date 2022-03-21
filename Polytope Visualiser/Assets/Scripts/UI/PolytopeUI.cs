@@ -8,7 +8,7 @@ using UnityEngine;
 using Util;
 using Random = UnityEngine.Random;
 
-namespace Polytope2D.UI
+namespace UI
 {
     public class PolytopeUI : MonoBehaviour
     {

@@ -2388,6 +2388,7 @@ MonoBehaviour:
   InputPanel: {fileID: 2146663515}
   AlertBox: {fileID: 1731799658}
   PolytopeDisplay: {fileID: 622774234}
+  MovementController: {fileID: 1030882147}
 --- !u!1 &933411255
 GameObject:
   m_ObjectHideFlags: 0

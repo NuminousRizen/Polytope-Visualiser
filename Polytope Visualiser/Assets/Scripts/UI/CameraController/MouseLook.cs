@@ -1,31 +1,34 @@
 using UnityEngine;
 
-public class MouseLook : MonoBehaviour
+namespace UI.CameraController
 {
-    public float mouseSensitivity = 50f;
+    public class MouseLook : MonoBehaviour
+    {
+        public float mouseSensitivity = 50f;
 
-    public Transform characterBody;
+        public Transform characterBody;
 
-    private float xRotation = 0f;
+        private float xRotation = 0f;
     
-    void Update()
-    {
-        if (Input.GetMouseButton(0))
+        void Update()
         {
-            float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
-            float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
+            if (Input.GetMouseButton(0))
+            {
+                float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
+                float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
 
-            xRotation -= mouseY;
+                xRotation -= mouseY;
 
-            transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+                transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
             
-            characterBody.Rotate(Vector3.up * mouseX);
+                characterBody.Rotate(Vector3.up * mouseX);
+            }
         }
-    }
 
-    public void Clear()
-    {
-        xRotation = 0f;
-        transform.localRotation = Quaternion.identity;
+        public void Clear()
+        {
+            xRotation = 0f;
+            transform.localRotation = Quaternion.identity;
+        }
     }
 }

@@ -1,48 +1,51 @@
 using UnityEngine;
 
-public class CharacterMovement : MonoBehaviour
+namespace UI.CameraController
 {
-    public CharacterController controller;
-
-    public Camera camera;
-
-    public float speed = 12f;
-
-    void Start()
+    public class CharacterMovement : MonoBehaviour
     {
-        controller.detectCollisions = false;
-    }
+        public CharacterController controller;
+
+        public Camera camera;
+
+        public float speed = 12f;
+
+        void Start()
+        {
+            controller.detectCollisions = false;
+        }
     
-    void Update()
-    {
-        float x = Input.GetAxis("Horizontal");
-        float z = Input.GetAxis("Vertical");
-        float y = 0;
-        if (Input.GetKey(KeyCode.Q))
+        void Update()
         {
-            y = 1;
+            float x = Input.GetAxis("Horizontal");
+            float z = Input.GetAxis("Vertical");
+            float y = 0;
+            if (Input.GetKey(KeyCode.Q))
+            {
+                y = 1;
+            }
+            if (Input.GetKey(KeyCode.E))
+            {
+                y = -1;
+            }
+
+            if (Input.GetKey(KeyCode.F))
+            {
+                Clear();
+            }
+
+            Vector3 move = transform.right * x + transform.forward * z + transform.up * y;
+
+            controller.Move(move * speed * Time.deltaTime);
         }
-        if (Input.GetKey(KeyCode.E))
+
+        public void Clear()
         {
-            y = -1;
+            controller.enabled = false;
+            transform.position = new Vector3(0f,0f,-10f);
+            controller.enabled = true;
+            transform.rotation = Quaternion.identity;
+            camera.GetComponent<MouseLook>().Clear();
         }
-
-        if (Input.GetKey(KeyCode.F))
-        {
-            Clear();
-        }
-
-        Vector3 move = transform.right * x + transform.forward * z + transform.up * y;
-
-        controller.Move(move * speed * Time.deltaTime);
-    }
-
-    public void Clear()
-    {
-        controller.enabled = false;
-        transform.position = new Vector3(0f,0f,-10f);
-        controller.enabled = true;
-        transform.rotation = Quaternion.identity;
-        camera.GetComponent<MouseLook>().Clear();
     }
 }

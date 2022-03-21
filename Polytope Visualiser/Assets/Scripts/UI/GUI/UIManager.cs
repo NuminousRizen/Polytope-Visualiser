@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using Polytope2D.UI;
 using Polytope2D.Util.Other;
 using TMPro;
+using UI.CameraController;
 using UnityEngine;
 using UnityEngine.UI;
 using Util;
