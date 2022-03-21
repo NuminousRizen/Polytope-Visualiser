@@ -8,33 +8,33 @@ namespace Polytope2D.Util.Other
     /// </summary>
     public struct Inequality
     {
-        private double _a, _b, _c;
+        private double a, b, c;
     
-        public Inequality(double a, double b, double c)
+        public Inequality(double _a, double _b, double _c)
         {
-            _a = a;
-            _b = b;
-            _c = c;
+            a = _a;
+            b = _b;
+            c = _c;
         }
 
         public double GetA()
         {
-            return _a;
+            return a;
         }
     
         public double GetB()
         {
-            return _b;
+            return b;
         }
 
         public double GetC()
         {
-            return _c;
+            return c;
         }
 
         public bool IsWithinBounds(double x, double y)
         {
-            return _a * x + _b * y + _c >= -VectorD2D.GetEpsilon();
+            return a * x + b * y + c >= -VectorD2D.GetEpsilon();
         }
         
         /// <summary>
@@ -44,7 +44,7 @@ namespace Polytope2D.Util.Other
         /// <returns>Whether the given point satisfies this inequality.</returns>
         public bool IsWithinBounds(VectorD2D point)
         {
-            return _a * point.x + _b * point.y + _c >= -VectorD2D.GetEpsilon();
+            return a * point.x + b * point.y + c >= -VectorD2D.GetEpsilon();
         }
 
         /// <summary>
@@ -54,8 +54,8 @@ namespace Polytope2D.Util.Other
         /// <returns>Whether the point is on the line.</returns>
         public bool IsOnInequalityLine(VectorD2D point)
         {
-            return _a * point.x + _b * point.y + _c >= -VectorD2D.GetEpsilon() && 
-                   _a * point.x + _b * point.y + _c <= VectorD2D.GetEpsilon();
+            return a * point.x + b * point.y + c >= -VectorD2D.GetEpsilon() && 
+                   a * point.x + b * point.y + c <= VectorD2D.GetEpsilon();
         }
     
         /// <summary>
@@ -65,20 +65,20 @@ namespace Polytope2D.Util.Other
         /// <returns>The point at which these inequalities intersect.</returns>
         public VectorD2D GetIntersection(Inequality other)
         {
-            double x = (other.GetC() * _b - _c * other.GetB()) / (_a * other.GetB() - other.GetA() * _b);
-            double y = (other.GetC() * _a - _c * other.GetA()) / (_b * other.GetA() - other.GetB() * _a);
+            double x = (other.GetC() * b - c * other.GetB()) / (a * other.GetB() - other.GetA() * b);
+            double y = (other.GetC() * a - c * other.GetA()) / (b * other.GetA() - other.GetB() * a);
 
             return new VectorD2D(x, y);
         }
 
         public override string ToString()
         {
-            return "(" + _a + ")x + (" + _b + ")y + (" + _c + ") >= 0";
+            return "(" + a + ")x + (" + b + ")y + (" + c + ") >= 0";
         }
 
         public string GetPrettyInequality()
         {
-            return "(" + _a + ")x + (" + _b + ")y + (" + _c + ") >= 0";
+            return "(" + a + ")x + (" + b + ")y + (" + c + ") >= 0";
         }
 
         /// <summary>
