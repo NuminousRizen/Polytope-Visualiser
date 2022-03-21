@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Polytope2D.UI
+namespace UI
 {
     [CreateAssetMenu(fileName = "New2DTheme", menuName = "2D Theme")]
     public class Theme2D : ScriptableObject
