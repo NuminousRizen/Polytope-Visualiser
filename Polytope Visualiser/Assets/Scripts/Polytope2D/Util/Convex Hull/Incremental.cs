@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Util;
 
 namespace Polytope2D.Util.Convex_Hull
@@ -32,7 +33,7 @@ namespace Polytope2D.Util.Convex_Hull
             VectorD2D? farthestPoint = null;
             foreach (VectorD2D point in points)
             {
-                double distance = edge.DistanceFromEdge(point);
+                double distance = Math.Abs(edge.DistanceFromEdge(point));
                 if (distance > farthestDistance)
                 {
                     farthestDistance = distance;

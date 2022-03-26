@@ -69,11 +69,12 @@ namespace Util
         /// <returns>The distance from this edge to the point.</returns>
         public double DistanceFromEdge(VectorD3D point)
         {
-            double a = p1.y - p2.y;
-            double b = p2.x - p1.x;
-            double c = p1.x * p2.y - p2.x * p1.y;
+            VectorD3D p1p2 = p2 - p1;
+            VectorD3D n = new VectorD3D(-p1p2.y, p1p2.x, 0);
 
-            return Math.Abs(a * point.x + b * point.y + c) / Math.Sqrt(a * a + b * b);
+            VectorD3D v = point - p1;
+
+            return (VectorD3D.Dot(v, n) / n.Magnitude());
         }
 
         /// <summary>
