@@ -107,7 +107,8 @@ namespace UI.GUI
         /// </summary>
         public void Build()
         {
-            Clear();
+            PolytopeDisplay.Clear();
+            MovementController.Clear();
             // Building with points
             try
             {
