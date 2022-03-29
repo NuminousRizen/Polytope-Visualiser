@@ -4,7 +4,7 @@ namespace UI.CameraController
 {
     public class MouseLook : MonoBehaviour
     {
-        public float mouseSensitivity = 50f;
+        public float mouseSensitivity = 100f;
 
         public Transform characterBody;
 

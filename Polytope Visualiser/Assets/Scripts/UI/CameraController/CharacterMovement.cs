@@ -13,6 +13,7 @@ namespace UI.CameraController
         void Start()
         {
             controller.detectCollisions = false;
+            Physics.IgnoreLayerCollision(0, 7, true);
         }
     
         void Update()
