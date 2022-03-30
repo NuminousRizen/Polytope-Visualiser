@@ -1,4 +1,6 @@
-﻿namespace Util
+﻿using UnityEngine;
+
+namespace Util
 {
     /// <summary>
     /// A plane inequality (i.e. a 3D inequality) is described as an inequality in the form ax + by + cz + d >= 0.
@@ -101,69 +103,50 @@
             }
         }
 
-        /// <summary>
-        /// Calculate the y value of the intersection point between three planes.
-        /// </summary>
-        /// <param name="z">The z value of the intersection point.</param>
-        /// <param name="p1">The first inequality.</param>
-        /// <param name="p2">The second inequality.</param>
-        /// <returns>The y value of the intersection point, null if no value could be found (i.e. planes do not intersect at a point).</returns>
-        private static double? GetY(double z, PlaneInequality p1, PlaneInequality p2)
+        public static bool AreParallel(PlaneInequality p1, PlaneInequality p2, PlaneInequality p3)
         {
-            try
-            {
-                double y = (
-                    ((p1.c * p2.a * z) + (p1.d * p2.a) - (p2.c * p1.a * z) - p2.d * p1.a) /
-                    ((p2.b * p1.a) - (p1.b * p2.a))
-                );
+            VectorD3D n1 = VectorD3D.Normalise(new VectorD3D(p1.a, p1.b, p1.c));
+            VectorD3D n2 = VectorD3D.Normalise(new VectorD3D(p2.a, p2.b, p2.c));
+            VectorD3D n3 = VectorD3D.Normalise(new VectorD3D(p3.a, p3.b, p3.c));
 
-                return y;
-            }
-            catch
-            {
-                return null;
-            }
+            return n1 == n2 || n2 == n3 || n1 == n3;
         }
 
         /// <summary>
-        /// Calculate the x value of the intersection point between three planes.
-        /// </summary>
-        /// <param name="z">The z value of the intersection point.</param>
-        /// <param name="y">The y value of the intersection point.</param>
-        /// <param name="p1">The first inequality</param>
-        /// <returns>The x value of the intersection point, null if no value could be found (i.e. planes do not intersect at a point).</returns>
-        private static double? GetX(double z, double y, PlaneInequality p1)
-        {
-            try
-            {
-                return (
-                    (-p1.b * y - p1.c * z - p1.d) /
-                    p1.a
-                );
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Get the intersection point between three planes.
+        /// Calculates the intersection point between the three planes provided.
         /// </summary>
         /// <param name="p1">The first plane.</param>
         /// <param name="p2">The second plane.</param>
         /// <param name="p3">The third plane.</param>
-        /// <returns>The intersection point, null if no point could be found (i.e. planes do not intersect at a point).</returns>
+        /// <returns>The intersection point of the planes or null if the planes do not meet at a point.</returns>
         public static VectorD3D? GetIntersection(PlaneInequality p1, PlaneInequality p2, PlaneInequality p3)
         {
-            double? z = GetZ(p1, p2, p3);
-            if (z == null) return null;
-            double? y = GetY(z.Value, p1, p2);
-            if (y == null) return null;
-            double? x = GetX(z.Value, y.Value, p1);
-            if (x == null) return null;
+            if (AreParallel(p1, p2, p3)) return null;
+            VectorD3D n1 = new VectorD3D(p1.a, p1.b, p1.c);
+            VectorD3D n2 = new VectorD3D(p2.a, p2.b, p2.c);
+            VectorD3D n3 = new VectorD3D(p3.a, p3.b, p3.c);
+            double tripleScalar = VectorD3D.Dot(VectorD3D.Cross(n1, n2), n3);
+            if (tripleScalar > -VectorD3D.GetEpsilon() && tripleScalar < VectorD3D.GetEpsilon()) return null;
+            
+            double[,] matrix = new double[3,4];
+            matrix[0, 0] = p1.a;
+            matrix[0, 1] = p1.b;
+            matrix[0, 2] = p1.c;
+            matrix[0, 3] = -p1.d;
+                
+            matrix[1, 0] = p2.a;
+            matrix[1, 1] = p2.b;
+            matrix[1, 2] = p2.c;
+            matrix[1, 3] = -p2.d;
+                
+            matrix[2, 0] = p3.a;
+            matrix[2, 1] = p3.b;
+            matrix[2, 2] = p3.c;
+            matrix[2, 3] = -p3.d;
+            
+            matrix = UtilLib.rref(matrix);
 
-            return new VectorD3D(x.Value, y.Value, z.Value);
+            return new VectorD3D(matrix[0, 3], matrix[1, 3], matrix[2, 3]);
         }
     }
 }
