@@ -12,7 +12,7 @@ namespace UI
 {
     public class PolytopeUI : MonoBehaviour
     {
-        public Theme2D theme;
+        public Theme theme;
         public GameObject tooltipDisplay;
 
         private Transform _convexHullPointsHolder;

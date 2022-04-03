@@ -143,6 +143,13 @@ namespace Util
             return new List<VectorD3D>(points);
         }
         
+        /// <summary>
+        /// Reduce a matrix to Reduced Row Echelon Form.
+        ///
+        /// Note: This code is from RosettaCode: https://rosettacode.org/wiki/Reduced_row_echelon_form.
+        /// </summary>
+        /// <param name="matrix">Matrix to reduce.</param>
+        /// <returns>Matrix in row reduced echelon form.</returns>
         public static double[,] rref(double[,] matrix)
         {            
             int lead = 0, rowCount = matrix.GetLength(0), columnCount = matrix.GetLength(1);
