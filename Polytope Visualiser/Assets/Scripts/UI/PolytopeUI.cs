@@ -309,6 +309,8 @@ namespace UI
                 polytopeMesh.vertices = new Vector3[]{facePoints.Item1.ToVector3(), facePoints.Item2.ToVector3(), facePoints.Item3.ToVector3()};
                 polytopeMesh.triangles = new int[]{0,1,2};
                 polytopeMesh.RecalculateNormals();
+                
+                face.FlipNormal();
             
                 GameObject polytopeFace = new GameObject(face.GetInequality());
                 polytopeFace.AddComponent<MeshFilter>().mesh = polytopeMesh;

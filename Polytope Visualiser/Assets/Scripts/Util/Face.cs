@@ -150,6 +150,17 @@ namespace Util
         }
 
         /// <summary>
+        /// A function to flip the normal of this face.
+        /// </summary>
+        public void FlipNormal()
+        {
+            faceInequality.a = -faceInequality.a;
+            faceInequality.b = -faceInequality.b;
+            faceInequality.c = -faceInequality.c;
+            faceInequality.d = -faceInequality.d;
+        }
+
+        /// <summary>
         /// Check whether this face is visible from a given point.
         /// </summary>
         /// <param name="eyePoint">The point from which to check the visibility from.</param>
