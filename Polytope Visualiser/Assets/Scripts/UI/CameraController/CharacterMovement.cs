@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace UI.CameraController
 {
+    /// <summary>
+    /// Component responsible for moving a character.
+    /// </summary>
     public class CharacterMovement : MonoBehaviour
     {
         public CharacterController controller;
@@ -10,12 +13,22 @@ namespace UI.CameraController
 
         public float speed = 12f;
 
+        /// <summary>
+        /// Event function called by Unity when the application is launched.
+        ///
+        /// Configures the character controller component to ignore all collisions.
+        /// </summary>
         void Start()
         {
             controller.detectCollisions = false;
             Physics.IgnoreLayerCollision(0, 7, true);
         }
     
+        /// <summary>
+        /// Event function called by Unity every frame.
+        ///
+        /// Checks if the user has pressed any of the relevant input keys and moves the character controller accordingly.
+        /// </summary>
         void Update()
         {
             float x = Input.GetAxis("Horizontal");
@@ -40,6 +53,9 @@ namespace UI.CameraController
             controller.Move(move * speed * Time.deltaTime);
         }
 
+        /// <summary>
+        /// Resets the position and rotation of the character.
+        /// </summary>
         public void Clear()
         {
             controller.enabled = false;
