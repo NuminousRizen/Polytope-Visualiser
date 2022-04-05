@@ -2,9 +2,8 @@ using Util;
 
 namespace Polytope2D.Util.Other
 {
-    // Holds an inequality in the form ax + by + c >= 0
     /// <summary>
-    /// An inequality is described as an inequality in the form ax + by + c >= 0.
+    /// Holds an inequality in the form ax + by + c >= 0.
     /// </summary>
     public struct Inequality
     {
