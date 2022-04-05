@@ -70,39 +70,12 @@ namespace Util
         }
 
         /// <summary>
-        /// Calculate the z value of the intersection point between the three planes.
+        /// Check if any of the given planes are parallel to each other.
         /// </summary>
-        /// <param name="p1">The first inequality.</param>
-        /// <param name="p2">The second inequality.</param>
-        /// <param name="p3">The third inequality.</param>
-        /// <returns>The z value of the intersection point, null if no value could be found (i.e. planes do not intersect at a point).</returns>
-        private static double? GetZ(PlaneInequality p1, PlaneInequality p2, PlaneInequality p3)
-        {
-            try
-            {
-                double top = (
-                    ((p3.a * p1.b * p1.d * p2.a) - (p3.a * p1.b * p1.d * p2.a)) / (p1.a * (p2.b * p1.a - p1.b * p2.a)) +
-                    ((p3.a * p1.d) / p1.a) +
-                    (((-p3.b * p1.d * p2.a) + (p3.b * p2.d * p1.a)) / ((p2.b * p1.a) - (p1.b * p2.a))) -
-                    p3.d
-                );
-
-                double bot = (
-                    ((p3.a * p1.b * p2.c * p1.a) - (p3.a * p1.b * p1.c * p2.a)) /
-                    (p1.a * ((p2.b * p1.a) - (p1.b * p2.a))) -
-                    ((p3.a * p1.c) / p1.a) +
-                    ((p3.b * p1.c * p2.a) - (p3.b * p2.c * p1.a)) / ((p2.b * p1.a) - (p1.b * p2.a)) +
-                    p3.c
-                );
-
-                return top / bot;
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
+        /// <param name="p1">The first plane.</param>
+        /// <param name="p2">The second plane.</param>
+        /// <param name="p3">The third plane.</param>
+        /// <returns>True if at least two planes are parallel, false otherwise.</returns>
         public static bool AreParallel(PlaneInequality p1, PlaneInequality p2, PlaneInequality p3)
         {
             VectorD3D n1 = VectorD3D.Normalise(new VectorD3D(p1.a, p1.b, p1.c));
