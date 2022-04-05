@@ -3,7 +3,7 @@ using UnityEngine;
 namespace UI.CameraController
 {
     /// <summary>
-    /// Component responsible getting mouse input and rotating the camera accordingly.
+    /// Component responsible for getting mouse input and rotating the camera accordingly.
     /// </summary>
     public class MouseLook : MonoBehaviour
     {
