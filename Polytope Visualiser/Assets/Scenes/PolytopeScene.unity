@@ -1718,7 +1718,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23fa1a1d112be3f4688a50b0a042117a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  theme: {fileID: 11400000, guid: 858bdc76d9b94854896b922f08806227, type: 2}
+  theme: {fileID: 11400000, guid: ab9322001e269424fbfa222f2e847714, type: 2}
   tooltipDisplay: {fileID: 612668262}
 --- !u!4 &622774235
 Transform:

@@ -16,6 +16,6 @@ MonoBehaviour:
   convexHullPointColour: {r: 0.26399994, g: 1, b: 0, a: 1}
   lineColour: {r: 0, g: 0.015245438, b: 1, a: 1}
   polygonColour: {r: 1, g: 1, b: 1, a: 0.59607846}
-  pointSize: 0.3
-  lineSize: 0.1
+  pointSize: 0.1
+  lineSize: 0.05
   pointPrefab: {fileID: 5295423626232801765, guid: 6b55008b7f3346745b62b78ceb2f938d, type: 3}
