@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6896f7bcc68090f49932e7ba32d5080e, type: 3}
   m_Name: High Contrast Theme
   m_EditorClassIdentifier: 
-  pointColour: {r: 1, g: 0.8227807, b: 0, a: 1}
+  pointColour: {r: 1, g: 0.100676015, b: 0, a: 1}
   convexHullPointColour: {r: 0.26399994, g: 1, b: 0, a: 1}
   lineColour: {r: 0, g: 0.015245438, b: 1, a: 1}
   polygonColour: {r: 1, g: 1, b: 1, a: 0.59607846}
