@@ -105,7 +105,7 @@ namespace Polytope2D.Util.Convex_Hull
             points.Sort((a, b) => SortByPolarAngle(p0, a, b));
             points = RemoveSameAngle(points, p0);
             points.Insert(0, p0);
-            if (points.Count < 3) return points;
+            if (points.Count < 3) throw new Exception("Cannot build a convex hull with less than 3 points.");
             
             convexHullPoints.Push(points[0]);
             convexHullPoints.Push(points[1]);
