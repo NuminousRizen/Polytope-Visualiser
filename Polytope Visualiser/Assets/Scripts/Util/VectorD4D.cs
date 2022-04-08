@@ -78,6 +78,7 @@ namespace Util
             return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
         }
 
+        // Note: Code for 4D cross product from: https://github.com/StoDevX/humke-4d-geometry.
         public static VectorD4D Cross(VectorD4D u, VectorD4D v, VectorD4D w)
         {
             double a = (v.x * w.y) - (v.y * w.x);
